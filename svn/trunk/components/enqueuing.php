@@ -1,6 +1,6 @@
 <?php
 /**
- * Shift8 CDN Rewrite Class
+ * Shift8 Enqueuing Files
  *
  * Function to load styles and front end scripts
  *
@@ -11,14 +11,14 @@ if ( !defined( 'ABSPATH' ) ) {
 }
 
 // Register admin scripts for custom fields
-function load_shift8_cdn_wp_admin_style() {
+function load_shift8_zoom_wp_admin_style() {
         // admin always last
-        wp_enqueue_style( 'shift8_cdn_css', plugin_dir_url(dirname(__FILE__)) . 'css/shift8_cdn_admin.css', array(), '2.4' );
-        wp_enqueue_script( 'shift8_cdn_script', plugin_dir_url(dirname(__FILE__)) . 'js/shift8_cdn_admin.js', array(), '2.2' );
+        wp_enqueue_style( 'shift8_zoom_css', plugin_dir_url(dirname(__FILE__)) . 'css/shift8_zoom_admin.css', array(), '1.3' );
+        wp_enqueue_script( 'shift8_zoom_script', plugin_dir_url(dirname(__FILE__)) . 'js/shift8_zoom_admin.js', array(), '1.1' );
 
-        wp_localize_script( 'shift8_cdn_script', 'the_ajax_script', array( 
+        wp_localize_script( 'shift8_zoom_script', 'the_ajax_script', array( 
             'ajaxurl' => admin_url( 'admin-ajax.php' ),
-            'nonce' => wp_create_nonce( "shift8_cdn_response_nonce"),
+            'nonce' => wp_create_nonce( "shift8_zoom_response_nonce"),
         ));  
 }
-add_action( 'admin_enqueue_scripts', 'load_shift8_cdn_wp_admin_style' );
+add_action( 'admin_enqueue_scripts', 'load_shift8_zoom_wp_admin_style' );
