@@ -35,9 +35,13 @@ function shift8_zoom_decrypt($key, $garble) {
 // Handle the ajax trigger
 add_action( 'wp_ajax_shift8_zoom_push', 'shift8_zoom_push' );
 function shift8_zoom_push() {
-    // Register
+    // Test
     if ( wp_verify_nonce($_GET['_wpnonce'], 'process') && $_GET['type'] == 'check') {
         shift8_zoom_poll('check');
+        die();
+    // Manual import of webinars from Zoom
+    } else if ( wp_verify_nonce($_GET['_wpnonce'], 'process') && $_GET['type'] == 'import') {
+        shift8_zoom_poll('import');
         die();
     } else {
         die();
@@ -59,7 +63,7 @@ function shift8_zoom_poll($shift8_action) {
             'Content-type: application/json',
             'Authorization' => 'Bearer ' . $zoom_jwt_token,
         );
-var_dump($zoom_jwt_token);
+
         // Check values with dashboard
         if ($shift8_action == 'check') {
             // Use WP Remote Get to poll the zoom api 
@@ -69,10 +73,9 @@ var_dump($zoom_jwt_token);
                     'headers' => $headers,
                     'httpversion' => '1.1',
                     'timeout' => '45',
-                    //'blocking' => true,
+                    'blocking' => true,
                 )
             );
-
             // Deal with the response
             if (is_object(json_decode($response['body']))) {
                 // Populate options from response if its a check
@@ -80,7 +83,7 @@ var_dump($zoom_jwt_token);
                     echo json_encode(array(
                         'total_records' => esc_attr(json_decode($response['body'])->total_records),
                         'webinar_data' => json_encode(json_decode($response['body'])->webinars),
-                    ));
+                    ));                  
                 }
 
             } else {
@@ -92,6 +95,39 @@ var_dump($zoom_jwt_token);
                     echo 'unknown';
                 }
             } 
+        } else if ($shift8_action == 'import') {
+            // Use WP Remote Get to poll the zoom api 
+            $response = wp_remote_get( S8ZOOM_API . '/v2/users/' . $zoom_user_email . '/webinars',
+                array(
+                    'method' => 'GET',
+                    'headers' => $headers,
+                    'httpversion' => '1.1',
+                    'timeout' => '45',
+                    'blocking' => true,
+                )
+            );
+            // Deal with the response
+            if (is_object(json_decode($response['body']))) {
+                // Populate options from response if its a check
+                if ($shift8_action == 'import') {         
+                    $webinar_data = json_decode($response['body'], true);
+                    $webinars_imported = shift8_zoom_import_webinars($webinar_data);
+                    echo json_encode(array(
+                        'total_records' => esc_attr(json_decode($response['body'])->total_records),
+                        'webinar_data' => json_encode(json_decode($response['body'])->webinars),
+                        'webinars_imported' => $webinars_imported,
+                    ));   
+                }
+
+            } else {
+                echo 'Error Detected : ';
+                if (is_array($response['response'])) {
+                    echo esc_attr(json_decode($response['body'])->error);
+
+                } else {
+                    echo 'unknown';
+                }
+            }
         }
     } 
 }
@@ -167,31 +203,45 @@ function shift8_zoom_debug_version_check() {
     echo '<strong>' . __( 'Active Plugins: ' ) . '</strong>' . $plugins . '<br />';
 }
 
-// Function to schedule cron polling interval to check if account is paid
+// Function to schedule cron polling interval to import Zoom webinars
 
 // Check user plan options
 add_action( 'shift8_zoom_cron_hook', 'shift8_zoom_check' );
 function shift8_zoom_check() {
-    $zoom_url = esc_attr(get_option('shift8_zoom_url'));
-    $zoom_api = esc_attr(get_option('shift8_zoom_api'));
+    $zoom_jwt_token = shift8_zoom_generate_jwt();
+    $zoom_user_email = sanitize_email(get_option('shift8_zoom_user_email'));
+
+     // Set headers for WP Remote post
+    $headers = array(
+        'Content-type: application/json',
+        'Authorization' => 'Bearer ' . $zoom_jwt_token,
+    );
 
     // Use WP Remote Get to poll the zoom api 
-    $response = wp_remote_get( S8ZOOM_API . '/api/check',
+    $response = wp_remote_get( S8ZOOM_API . '/v2/users/' . $zoom_user_email . '/webinars',
         array(
-            'method' => 'POST',
+            'method' => 'GET',
+            'headers' => $headers,
             'httpversion' => '1.1',
             'timeout' => '45',
             'blocking' => true,
-            'body' => array(
-                'url' => $zoom_url,
-                'api' => $zoom_api
-            ),
         )
     );
-    // Set transient based on results
-    $suffix_get = esc_attr(json_decode($response['body'])->user_plan->zoom_suffix);
-    $suffix_set = (!empty($suffix_get) && $suffix_get !== "" ? $suffix_get : S8ZOOM_SUFFIX );
-    set_transient(S8ZOOM_PAID_CHECK, $suffix_set, 0);
+
+    // Deal with the response
+    if (is_object(json_decode($response['body']))) {
+        // Pass the returned webinars to a function to handle the import
+        $webinar_data = json_decode($response['body']->webinar_data, true);
+        shift8_zoom_import_webinars($webinar_data);
+    } else {
+        echo 'Error Detected : ';
+        if (is_array($response['response'])) {
+            echo esc_attr(json_decode($response['body'])->error);
+
+        } else {
+            echo 'unknown';
+        }
+    }
 }
 
 // Custom Cron schedules outside of default WP Cron
@@ -215,9 +265,14 @@ function shift8_zoom_add_cron_interval( $schedules ) {
     return $schedules;
 }
 
-// Set the cron task on an hourly basis to check the zoom suffix
-if ( ! wp_next_scheduled( 'shift8_zoom_cron_hook' ) ) {
-    wp_schedule_event( time(), 'shift8_zoom_fourhour', 'shift8_zoom_cron_hook' );
+// Set the cron task on an hourly basis to check the zoom suffix, only if enabled and all fields populated
+if (shift8_zoom_check_enabled()) {
+    if ( ! wp_next_scheduled( 'shift8_zoom_cron_hook' ) ) {
+    //wp_schedule_event( time(), esc_attr(get_option('shift8_zoom_import_frequency')), 'shift8_zoom_cron_hook' );
+        wp_schedule_event( time(), 'shift8_zoom_five', 'shift8_zoom_cron_hook' );
+    } 
+} else {
+    wp_clear_scheduled_hook( 'shift8_zoom_cron_hook' );
 }
 
 
@@ -248,4 +303,54 @@ function shift8_zoom_get_import_frequency_options() {
         'weekly' => 'Weekly'
     );
     return $import_frequency;
+}
+
+
+// Function to import webinar data
+function shift8_zoom_import_webinars($webinar_data) {
+    $import_count = 0;
+    if (is_array($webinar_data) && $webinar_data['webinars']) {
+        foreach ($webinar_data['webinars'] as $webinar) {
+            // Check if the UUID exists already
+            $args = array(  
+                'post_type' => 'shift8_zoom',
+                'post_status' => 'publish',
+                'posts_per_page' => -1, 
+                'meta_query'     => array(
+                    array(
+                        'key'       => '_post_shift8_zoom_uuid',
+                        'value'     => $webinar['uuid'],
+                        'compare'   => '='
+                    )
+                ),
+                'order' => 'ASC', 
+            );
+            $query = new WP_Query ( $args );
+            // If UUID exists, move on
+            if ($query->have_posts()) {
+                continue;
+            } else {
+                // Create post object
+                $webinar_post = array(
+                    'post_title'    => wp_strip_all_tags( $webinar['topic'] ),
+                    'post_status'   => 'publish',
+                    'post_type'     => 'shift8_zoom',
+                    'post_author'   => 1,
+                );
+
+                // Insert the post into the database
+                $post_id = wp_insert_post( $webinar_post );
+                update_post_meta( $post_id, "_post_shift8_zoom_uuid", sanitize_text_field( $webinar['uuid']) );
+                update_post_meta( $post_id, "_post_shift8_zoom_id", sanitize_text_field( $webinar['id']) );
+                update_post_meta( $post_id, "_post_shift8_zoom_type", sanitize_text_field( $webinar['type']) );
+                update_post_meta( $post_id, "_post_shift8_zoom_start", sanitize_text_field( $webinar['start_time'] ) );
+                update_post_meta( $post_id, "_post_shift8_zoom_duration", sanitize_text_field( $webinar['duration'] ) );
+                update_post_meta( $post_id, "_post_shift8_zoom_timezone", sanitize_text_field( $webinar['timezone'] ) );
+                update_post_meta( $post_id, "_post_shift8_zoom_joinurl", sanitize_url( $webinar['join_url'] ) );
+                update_post_meta( $post_id, "_post_shift8_zoom_agenda_html", sanitize_text_field( $webinar['agenda'] ) );
+                $import_count++;
+            }
+        }      
+    }
+    return $import_count;
 }
