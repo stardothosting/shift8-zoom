@@ -17,6 +17,7 @@ if ( is_readable( __DIR__ . '/vendor/autoload.php' ) ) {
 require_once(plugin_dir_path(__FILE__).'shift8-zoom-rules.php' );
 require_once(plugin_dir_path(__FILE__).'components/enqueuing.php' );
 require_once(plugin_dir_path(__FILE__).'components/settings.php' );
+require_once(plugin_dir_path(__FILE__).'components/custom_post.php' );
 require_once(plugin_dir_path(__FILE__).'components/functions.php' );
 
 // Admin welcome page
@@ -58,6 +59,7 @@ $plugin_name = $plugin_data['TextDomain'];
 			}
 		}
 	}
+    var_dump(shift8_zoom_generate_jwt());
 	?>
     <table class="form-table shift8-zoom-table">
     <tbody class="<?php echo $active_tab == 'core_settings' ? 'shift8-zoom-admin-tab-active' : 'shift8-zoom-admin-tab-inactive'; ?>">
