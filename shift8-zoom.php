@@ -59,7 +59,7 @@ $plugin_name = $plugin_data['TextDomain'];
 			}
 		}
 	}
-    var_dump(shift8_zoom_generate_jwt());
+
 	?>
     <table class="form-table shift8-zoom-table">
     <tbody class="<?php echo $active_tab == 'core_settings' ? 'shift8-zoom-admin-tab-active' : 'shift8-zoom-admin-tab-inactive'; ?>">
@@ -145,7 +145,12 @@ $plugin_name = $plugin_data['TextDomain'];
     <?php if (!empty(esc_attr(get_option('shift8_zoom_api_key')) && esc_attr(get_option('shift8_zoom_api_secret')))) { ?>
     <li>
     <div class="shift8-zoom-button-container">
-    <a id="shift8-zoom-check" href="<?php echo wp_nonce_url( admin_url('admin-ajax.php?action=shift8_zoom_push'), 'process'); ?>"><button class="shift8-zoom-button shift8-zoom-button-check">Check</button></a>
+    <a id="shift8-zoom-check" href="<?php echo wp_nonce_url( admin_url('admin-ajax.php?action=shift8_zoom_push'), 'process'); ?>"><button class="shift8-zoom-button shift8-zoom-button-check">Test</button></a>
+    </div>
+    </li>
+    <li>
+    <div class="shift8-zoom-button-container">
+    <a id="shift8-zoom-import" href="<?php echo wp_nonce_url( admin_url('admin-ajax.php?action=shift8_zoom_push'), 'process'); ?>"><button class="shift8-zoom-button shift8-zoom-button-import">Manual Import</button></a>
     </div>
     </li>
     <?php } ?>

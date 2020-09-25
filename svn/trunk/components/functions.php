@@ -59,7 +59,7 @@ function shift8_zoom_poll($shift8_action) {
             'Content-type: application/json',
             'Authorization' => 'Bearer ' . $zoom_jwt_token,
         );
-
+var_dump($zoom_jwt_token);
         // Check values with dashboard
         if ($shift8_action == 'check') {
             // Use WP Remote Get to poll the zoom api 

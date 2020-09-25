@@ -15,11 +15,6 @@ jQuery(document).ready(function() {
             },
             success:function(data) {
                 // This outputs the result of the ajax request
-                //if (data != null) {
-                //    jQuery('#shift8_cdn_api_field').val(data.apikey);
-                //    jQuery('#shift8_cdn_prefix_field').val(data.cdnprefix);
-                //}
-                console.log('data : ' + JSON.stringify(data.total_records));
                 jQuery('.shift8-zoom-response').html('Zoom connection test successful. Total webinars polled : ' + data.total_records).fadeIn();
                 setTimeout(function(){ jQuery('.shift8-zoom-response').fadeOut() }, 25000);
                 jQuery(".shift8-zoom-spinner").hide();               
@@ -30,7 +25,37 @@ jQuery(document).ready(function() {
                 setTimeout(function(){ jQuery('.shift8-zoom-response').fadeOut() }, 5000);
                 jQuery(".shift8-zoom-spinner").hide();
             }
-        }); 
+        });
+        alert(JSON.stringify(data)); 
+    });
+
+    // Manually import webinars
+    jQuery(document).on( 'click', '#shift8-zoom-import', function(e) {
+        jQuery(".shift8-zoom-spinner").show();
+        e.preventDefault();
+        var button = jQuery(this);
+        var url = button.attr('href');
+        jQuery.ajax({
+            url: url,
+            dataType: 'json',
+            data: {
+                'action': 'shift8_zoom_push',
+                'type': 'import'
+            },
+            success:function(data) {
+                // This outputs the result of the ajax request
+                jQuery('.shift8-zoom-response').html('Zoom import successful. Total webinars polled : ' + data.total_records + ' Total new webinars imported : ' + data.webinars_imported).fadeIn();
+                setTimeout(function(){ jQuery('.shift8-zoom-response').fadeOut() }, 25000);
+                jQuery(".shift8-zoom-spinner").hide();               
+            },
+            error: function(errorThrown){
+                console.log('Error : ' + JSON.stringify(errorThrown));
+                jQuery('.shift8-zoom-response').html(errorThrown.responseText).fadeIn();
+                setTimeout(function(){ jQuery('.shift8-zoom-response').fadeOut() }, 5000);
+                jQuery(".shift8-zoom-spinner").hide();
+            }
+        });
+
     });
 });
 

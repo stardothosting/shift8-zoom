@@ -35,7 +35,7 @@ function register_shift8_zoom_post_type() {
       'show_ui'            => true,
       'show_in_menu'       => true,
       'query_var'          => true,
-      'rewrite'            => array( 'slug' => 'shift8_zoom' ),
+      'rewrite'            => array( 'slug' => 'zoom' ),
       'capability_type'    => 'post',
       'has_archive'        => true,
       'hierarchical'       => false,
@@ -81,8 +81,12 @@ function shift8_zoom_save_post_meta_boxes(){
     if ( get_post_status( $post->ID ) === 'auto-draft' ) {
         return;
     }
-    update_post_meta( $post->ID, "_post_advertising_category", sanitize_text_field( $_POST[ "_post_advertising_category" ] ) );
-    update_post_meta( $post->ID, "_post_advertising_html", sanitize_text_field( $_POST[ "_post_advertising_html" ] ) );
+    update_post_meta( $post->ID, "_post_shift8_zoom_type", sanitize_text_field( $_POST[ "_post_shift8_zoom_type" ] ) );
+    update_post_meta( $post->ID, "_post_shift8_zoom_start", sanitize_text_field( $_POST[ "_post_shift8_zoom_start" ] ) );
+    update_post_meta( $post->ID, "_post_shift8_zoom_duration", sanitize_text_field( $_POST[ "_post_shift8_zoom_duration" ] ) );
+    update_post_meta( $post->ID, "_post_shift8_zoom_timezone", sanitize_text_field( $_POST[ "_post_shift8_zoom_timezone" ] ) );
+    update_post_meta( $post->ID, "_post_shift8_zoom_joinurl", sanitize_url( $_POST[ "_post_shift8_zoom_joinurl" ] ) );
+    update_post_meta( $post->ID, "_post_shift8_zoom_agenda_html", sanitize_text_field( $_POST[ "_post_shift8_zoom_agenda_html" ] ) );
 }
 add_action( 'save_post', 'shift8_zoom_save_post_meta_boxes' );
 
@@ -90,24 +94,47 @@ add_action( 'save_post', 'shift8_zoom_save_post_meta_boxes' );
 function shift8_zoom_post_meta_box(){
     global $post;
     $custom = get_post_custom( $post->ID );
-    $advertisingCategory = $custom[ "_post_advertising_category" ][ 0 ];
-    $advertisingHtml = $custom[ "_post_advertising_html" ][ 0 ];
+    $zoom_uuid = $custom[ "_post_shift8_zoom_uuid" ][ 0 ];
+    $zoom_id = $custom[ "_post_shift8_zoom_id" ][ 0 ];
+    $zoom_type = $custom[ "_post_shift8_zoom_type" ][ 0 ];
+    switch ( $zoom_type ) {
+        case '5':
+            $webinarSelected = "selected";
+            break;
+        case '6':
+            $recurringNoFixedSelected = "selected";
+            break;
+        case '9':
+            $recurringFixedSelected = "selected";
+            break;
+    }
+    $zoom_start = $custom[ "_post_shift8_zoom_start" ][ 0 ];
+    $zoom_duration = $custom[ "_post_shift8_zoom_duration" ][ 0 ];
+    $zoom_timezone = $custom[ "_post_shift8_zoom_timezone" ][ 0 ];
+    $zoom_joinurl = $custom[ "_post_shift8_zoom_joinurl" ][ 0 ];
+    $zoom_agenda = $custom[ "_post_shift8_zoom_agenda_html" ][ 0 ];
 
+    echo '<div class="shift8-zoom-admin-custom-fields">';
+    echo '<label>UUID :</label><input type="text" name="_post_shift8_zoom_uuid" value="'. $zoom_uuid . '" readonly/>';
+    echo '<label>ID :</label><input type="text" name="_post_shift8_zoom_id" value="' . $zoom_id . '" readonly/><br />';
+	echo '<label>Type :</label><select name="_post_shift8_zoom_type"/>
+		<option value="5" ' . $webinarSelected . '>Webinar</option>
+		<option value="6" ' . $recurringNoFixedSelected . '>Recurring webinar with no fixed time</option>
+		<option value="9" ' . $recurringFixedSelected . '>Recurring webinar with a fixed time</option>
+		</select>
+	<br />';
+	echo '<label>Start Time :</label><input type="text" name="_post_shift8_zoom_start" value="' . $zoom_start . '"/><br />';
+	echo '<label>Duration :</label><input type="text" name="_post_shift8_zoom_duration" value="' . $zoom_duration . '"/><br />';
+	echo '<label>Timezone :</label><input type="text" name="_post_shift8_zoom_timezone" value="' . $zoom_timezone . '"/><br />';
+	echo '<label>Join URL :</label><input type="text" name="_post_shift8_zoom_joinurl" value="' . $zoom_joinurl . '"/><br /><br />';
+	echo '<label><b>Agenda Details :</b></label><br /><br />';
     wp_editor(
-        htmlspecialchars_decode( $advertisingHtml ),
+        htmlspecialchars_decode( $zoom_agenda ),
         '_post_shift8_zoom_agenda_html',
         $settings = array(
             'textarea_name' => '_post_shift8_zoom_agenda_html',
         )
     );
-
-    echo '<div class="shift8-zoom-admin-custom-fields">';
-    echo '<label>UUID :</label><input type="text" name="meta_key" value="test" readonly/>';
-    echo '<label>ID :</label><input type="text" name="meta_key" value="test" readonly/><br />';
-	echo '<label>Type :</label><input type="text" name="meta_key" value="5, 6 , 9"/><br />';
-	echo '<label>Start Time :</label><input type="text" name="meta_key" value="2020-07-08T16:00:00Z"/><br />';
-	echo '<label>Duration :</label><input type="text" name="meta_key" value="30"/><br />';
-	echo '<label>Timezone :</label><input type="text" name="meta_key" value="America/New_York"/><br />';
     echo '</div>';
 
 }

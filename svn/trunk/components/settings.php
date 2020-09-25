@@ -32,43 +32,6 @@ function register_shift8_zoom_settings() {
     register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_import_frequency');
 }
 
-// Register custom post type
-function register_shift8_zoom_post_type() {
-    $labels = array(
-      'name'               => 'Shift8 Zoom',
-      'singular_name'      => 'Zoom Webinar',
-      'add_new'            => 'Add New',
-      'add_new_item'       => 'Add New Webinar',
-      'edit_item'          => 'Edit Webinar',
-      'new_item'           => 'New Webinar',
-      'all_items'          => 'All Webinars',
-      'view_item'          => 'View Webinar',
-      'search_items'       => 'Search Webinars',
-      'not_found'          =>  'No webinars found',
-      'not_found_in_trash' => 'No webinars found in Trash',
-      'parent_item_colon'  => '',
-      'menu_name'          => 'Shift8 Zoom'
-    );
-
-    $args = array(
-      'labels'             => $labels,
-      'public'             => true,
-      'publicly_queryable' => true,
-      'show_ui'            => true,
-      'show_in_menu'       => true,
-      'query_var'          => true,
-      'rewrite'            => array( 'slug' => 'webinar' ),
-      'capability_type'    => 'post',
-      'has_archive'        => true,
-      'hierarchical'       => false,
-      'menu_position'      => null,
-      'supports'           => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments' )
-    );
-
-    register_post_type( 'shift8_zoom', $args );
-}
-add_action( 'init', 'register_shift8_zoom_post_type' );
-
 // Uninstall hook
 function shift8_zoom_uninstall_hook() {
   // Delete setting values
@@ -86,11 +49,6 @@ function shift8_zoom_uninstall_hook() {
   add_action('init','shift8_zoom_delete_post_type');
 }
 register_uninstall_hook( S8ZOOM_FILE, 'shift8_zoom_uninstall_hook' );
-
-// Delete custom post type 
-function shift8_zoom_delete_post_type(){
-    unregister_post_type( 'shfit8_zoom' );
-}
 
 // Deactivation hook
 function shift8_zoom_deactivation() {

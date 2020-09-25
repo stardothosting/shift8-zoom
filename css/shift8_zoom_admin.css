@@ -13,10 +13,10 @@
 .shift8-zoom-button-check {
     background-color: #f4cd36;
 }
-.shift8-zoom-button-register {
+.shift8-zoom-button-import {
     background-color: #2ecc71;
 }
-.shift8-zoom-button-register:hover {
+.shift8-zoom-button-import:hover {
     background-color: #5fd491;
     cursor:pointer;
 }
@@ -222,7 +222,7 @@ input:checked + .slider:before {
 .shift8-zoom-admin-custom-fields {
 	width:80%;
 }
-.shift8-zoom-admin-custom-fields input {
+.shift8-zoom-admin-custom-fields input, .shift8-zoom-admin-custom-fields select, .shift8-zoom-admin-custom-fields textarea {
 	margin: 10px 0 10px 10px;
 }
 .shift8-zoom-admin-custom-fields label {
