@@ -29,7 +29,7 @@ function register_shift8_zoom_settings() {
     register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_user_email' );
     register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_api_key' );
     register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_api_secret' );
-    register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_import_frequency');
+    register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_import_frequency', 'shift8_zoom_cron_validate');
 }
 
 // Uninstall hook
@@ -82,3 +82,15 @@ function shift8_zoom_check_options() {
   return $shift8_options;
 }
 
+// Force cron schedule change if detected
+function shift8_zoom_cron_validate($data){
+  $cron_schedule = esc_attr($data);
+  if (get_transient(S8ZOOM_CRON_SCHEDULE) && get_transient(S8ZOOM_CRON_SCHEDULE) === $cron_schedule) {
+    set_transient(S8ZOOM_CRON_SCHEDULE, $cron_schedule, 0);
+    return $cron_schedule;
+  } else {
+    set_transient(S8ZOOM_CRON_SCHEDULE, $cron_schedule, 0);
+    wp_clear_scheduled_hook( 'shift8_zoom_cron_hook' );
+    return $cron_schedule;
+  }
+}
