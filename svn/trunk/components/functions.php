@@ -6,6 +6,7 @@
  *
  */
 use \Firebase\JWT\JWT;
+use Carbon\Carbon;
 
 if ( !defined( 'ABSPATH' ) ) {
     die();
@@ -343,7 +344,7 @@ function shift8_zoom_import_webinars($webinar_data) {
                 update_post_meta( $post_id, "_post_shift8_zoom_uuid", sanitize_text_field( $webinar['uuid']) );
                 update_post_meta( $post_id, "_post_shift8_zoom_id", sanitize_text_field( $webinar['id']) );
                 update_post_meta( $post_id, "_post_shift8_zoom_type", sanitize_text_field( $webinar['type']) );
-                update_post_meta( $post_id, "_post_shift8_zoom_start", sanitize_text_field( $webinar['start_time'] ) );
+                update_post_meta( $post_id, "_post_shift8_zoom_start", wp_date(Carbon::create(sanitize_text_field( $webinar['start_time'] ))) );
                 update_post_meta( $post_id, "_post_shift8_zoom_duration", sanitize_text_field( $webinar['duration'] ) );
                 update_post_meta( $post_id, "_post_shift8_zoom_timezone", sanitize_text_field( $webinar['timezone'] ) );
                 update_post_meta( $post_id, "_post_shift8_zoom_joinurl", sanitize_url( $webinar['join_url'] ) );

@@ -33,6 +33,16 @@ function shift8_zoom_decrypt($key, $garble) {
     }
 }
 
+// Function to write to log file for debugging
+function shift8_zoom_write_log($log) {
+    if (true === WP_DEBUG) {
+        if (is_array($log) || is_object($log)) {
+            error_log(print_r($log, true));
+        } else {
+            error_log($log);
+        }
+    }
+}
 // Handle the ajax trigger
 add_action( 'wp_ajax_shift8_zoom_push', 'shift8_zoom_push' );
 function shift8_zoom_push() {
@@ -64,7 +74,6 @@ function shift8_zoom_poll($shift8_action) {
             'Content-type: application/json',
             'Authorization' => 'Bearer ' . $zoom_jwt_token,
         );
-
         // Check values with dashboard
         if ($shift8_action == 'check') {
             // Use WP Remote Get to poll the zoom api 
@@ -228,12 +237,11 @@ function shift8_zoom_check() {
             'blocking' => true,
         )
     );
-
     // Deal with the response
     if (is_object(json_decode($response['body']))) {
         // Pass the returned webinars to a function to handle the import
-        $webinar_data = json_decode($response['body']->webinar_data, true);
-        shift8_zoom_import_webinars($webinar_data);
+        $webinar_data = json_decode($response['body'], true);
+        $webinars_imported = shift8_zoom_import_webinars($webinar_data);
     } else {
         echo 'Error Detected : ';
         if (is_array($response['response'])) {
@@ -269,13 +277,13 @@ function shift8_zoom_add_cron_interval( $schedules ) {
 // Set the cron task on an hourly basis to check the zoom suffix, only if enabled and all fields populated
 if (shift8_zoom_check_enabled()) {
     if ( ! wp_next_scheduled( 'shift8_zoom_cron_hook' ) ) {
-    //wp_schedule_event( time(), esc_attr(get_option('shift8_zoom_import_frequency')), 'shift8_zoom_cron_hook' );
-        wp_schedule_event( time(), 'shift8_zoom_five', 'shift8_zoom_cron_hook' );
+        wp_schedule_event( time(), esc_attr(get_option('shift8_zoom_import_frequency')), 'shift8_zoom_cron_hook' );
     } 
 } else {
     wp_clear_scheduled_hook( 'shift8_zoom_cron_hook' );
 }
 
+shift8_zoom_write_log(wp_next_scheduled( 'shift8_zoom_cron_hook' ) );
 
 // Generate JWT Token 
 function shift8_zoom_generate_jwt() {
@@ -289,9 +297,6 @@ function shift8_zoom_generate_jwt() {
         "iss" => $key,
         "exp" => 1496091964000,
     );
-    //$header_encode = JWT::urlsafeB64Encode(JWT::jsonEncode($header));
-    //$payload_encode = JWT::urlsafeB64Encode(JWT::jsonEncode($payload));
-    //$decoded = JWT::decode($jwt, $key, array('HS256'));
     $jwt = JWT::encode($payload, $secret);
     return $jwt;
 }
