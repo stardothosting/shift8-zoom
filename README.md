@@ -1,4 +1,4 @@
-# Shift8 Zoom
+# Shift8 Zoom Webinar
 * Contributors: shift8
 * Donate link: https://www.shift8web.ca
 * Tags: zoom, webinar, shift8, import
