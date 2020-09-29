@@ -102,7 +102,7 @@ $plugin_name = $plugin_data['TextDomain'];
     </tr>
 	<tr valign="top">
     <th scope="row">Shift8 Zoom API Key : </th>
-    <td><input type="text" id="shift8_zoom_api_key_field" name="shift8_zoom_api_key" size="34" value="<?php echo (empty(esc_attr(get_option('shift8_zoom_api_key'))) ? '' : esc_attr(get_option('shift8_zoom_api_key'))); ?>">
+    <td><input type="password" id="shift8_zoom_api_key_field" name="shift8_zoom_api_key" size="34" value="<?php echo (empty(esc_attr(get_option('shift8_zoom_api_key'))) ? '' : esc_attr(get_option('shift8_zoom_api_key'))); ?>">
     <div class="shift8-zoom-tooltip"><span class="dashicons dashicons-editor-help"></span>
         <span class="shift8-zoom-tooltiptext">Create a JWT app in your Zoom account to get this</span>
     </div>
@@ -110,7 +110,7 @@ $plugin_name = $plugin_data['TextDomain'];
 	</tr>
 	<tr valign="top">
     <th scope="row">Shift8 Zoom API Secret : </th>
-    <td><input type="text" id="shift8_zoom_prefix_field" name="shift8_zoom_api_secret" size="34" value="<?php echo (empty(esc_attr(get_option('shift8_zoom_api_secret'))) ? '' : esc_attr(get_option('shift8_zoom_api_secret'))); ?>">
+    <td><input type="password" id="shift8_zoom_api_secret_field" name="shift8_zoom_api_secret" size="34" value="<?php echo (empty(esc_attr(get_option('shift8_zoom_api_secret'))) ? '' : esc_attr(get_option('shift8_zoom_api_secret'))); ?>">
     <div class="shift8-zoom-tooltip"><span class="dashicons dashicons-editor-help"></span>
         <span class="shift8-zoom-tooltiptext">Create a JWT app in your Zoom account to get this</span>
     </div>

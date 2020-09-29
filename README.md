@@ -49,9 +49,7 @@ Visit the support forums here and let us know. We will try our best to help!
 
 ## Screenshots 
 
-1.
-2.
-3.
+1. Main settings page of plugin admin
 
 ## Changelog 
 

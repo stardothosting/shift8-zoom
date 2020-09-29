@@ -325,7 +325,7 @@ function shift8_zoom_import_webinars($webinar_data) {
                 'meta_query'     => array(
                     array(
                         'key'       => '_post_shift8_zoom_uuid',
-                        'value'     => $webinar['uuid'],
+                        'value'     => sanitize_text_field($webinar['uuid']),
                         'compare'   => '='
                     )
                 ),
