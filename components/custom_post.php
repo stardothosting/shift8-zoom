@@ -44,6 +44,12 @@ function register_shift8_zoom_post_type() {
     );
 
     register_post_type( 'shift8_zoom', $args );
+
+    // Flush rewrite rules
+    if( !get_option('shift8_zoom_plugin_permalinks_flushed') ) {
+        flush_rewrite_rules(false);
+        update_option('shift8_zoom_plugin_permalinks_flushed', 1);
+    }
 }
 add_action( 'init', 'register_shift8_zoom_post_type' );
 

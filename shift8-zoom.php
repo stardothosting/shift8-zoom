@@ -44,6 +44,7 @@ $plugin_name = $plugin_data['TextDomain'];
     ?>
 <h2 class="nav-tab-wrapper">
     <a href="?page=<?php echo $plugin_name; ?>%2Fcomponents%2Fsettings.php%2Fcustom&tab=core_settings" class="nav-tab <?php echo $active_tab == 'core_settings' ? 'nav-tab-active' : ''; ?>">Core Settings</a>
+    <a href="?page=<?php echo $plugin_name; ?>%2Fcomponents%2Fsettings.php%2Fcustom&tab=shortcode_examples" class="nav-tab <?php echo $active_tab == 'shortcode_examples' ? 'nav-tab-active' : ''; ?>">Shortcode Examples</a>
     <a href="?page=<?php echo $plugin_name; ?>%2Fcomponents%2Fsettings.php%2Fcustom&tab=support_options" class="nav-tab <?php echo $active_tab == 'support_options' ? 'nav-tab-active' : ''; ?>">Support</a>
 </h2>
 
@@ -160,6 +161,24 @@ $plugin_name = $plugin_data['TextDomain'];
     </td>
     </tr>
     </tbody>
+    <!-- SHORTCODE EXAMPLES TAB -->
+    <tbody class="<?php echo $active_tab == 'shortcode_examples' ? 'shift8-zoom-admin-tab-active' : 'shift8-zoom-admin-tab-inactive'; ?>">
+    <tr valign="top">
+    <th scope="row">Shortcode Examples</th>
+    </tr>
+    <tr valign="top">
+    <td style="width:500px;">Below find some shortcode examples that can be used in any post grid. The idea is to feed the Zoom events into a post grid and use the shortcode below in the grid template to pull the custom fields.<br /><br />
+    <!--<tr valign="top">
+    <th scope="row">Shortcode</th>
+    <td>Description</td>
+    </tr>
+    <tr>
+    <td><b>[shift8_zoom_title]</b></td>
+    <td>Display the event title</td>
+    </tr>-->
+    </td>
+    </tr>
+    </tbody>
     <!-- SUPPORT TAB -->
     <tbody class="<?php echo $active_tab == 'support_options' ? 'shift8-zoom-admin-tab-active' : 'shift8-zoom-admin-tab-inactive'; ?>">
     <tr valign="top">
@@ -198,7 +217,7 @@ $plugin_name = $plugin_data['TextDomain'];
     </tbody>
     </table>
     <?php 
-    if ($active_tab !== 'support_options') {
+    if ($active_tab !== 'support_options' && $active_tab !== 'shortcode_examples') {
         submit_button(); 
     }
     ?>

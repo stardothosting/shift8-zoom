@@ -30,7 +30,15 @@ function register_shift8_zoom_settings() {
     register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_api_key' );
     register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_api_secret' );
     register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_import_frequency', 'shift8_zoom_cron_validate');
+    register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_permalinks_flushed');
 }
+
+// Activation hook
+function shift8_zoom_plugin_activation() {
+    update_option('shift8_zoom_permalinks_flushed', 0);
+}
+register_activation_hook( S8ZOOM_FILE, 'shift8_zoom_plugin_activation' );
+ 
 
 // Uninstall hook
 function shift8_zoom_uninstall_hook() {
@@ -40,11 +48,10 @@ function shift8_zoom_uninstall_hook() {
   delete_option('shift8_zoom_api_key');
   delete_option('shift8_zoom_api_secret');
   delete_option('shift8_zoom_import_frequency');
+  delete_option('shift8_zoom_permalinks_flushed');
 
   // Clear Cron tasks
   wp_clear_scheduled_hook( 'shift8_zoom_cron_hook' );
-  // Delete transient data
-  delete_transient(S8ZOOM_PAID_CHECK);
   // Deregister custom post type
   add_action('init','shift8_zoom_delete_post_type');
 }
@@ -54,8 +61,6 @@ register_uninstall_hook( S8ZOOM_FILE, 'shift8_zoom_uninstall_hook' );
 function shift8_zoom_deactivation() {
   // Clear Cron tasks
   wp_clear_scheduled_hook( 'shift8_zoom_cron_hook' );
-  // Delete transient
-  delete_transient(S8ZOOM_PAID_CHECK);
 }
 register_deactivation_hook( S8ZOOM_FILE, 'shift8_zoom_deactivation' );
 
