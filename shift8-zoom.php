@@ -3,7 +3,7 @@
  * Plugin Name: Shift8 Zoom
  * Plugin URI: https://github.com/stardothosting/shift8-zoom
  * Description: Plugin that imports Zoom webinars into custom content or existing content
- * Version: 1.0.2
+ * Version: 1.0.3
  * Author: Shift8 Web 
  * Author URI: https://www.shift8web.ca
  * License: GPLv3
@@ -69,11 +69,11 @@ $plugin_name = $plugin_data['TextDomain'];
     <td><span id="shift8-zoom-notice">
     <?php 
     settings_errors('shift8_zoom_url');
-    settings_errors('shift8_zoom_api');
-    settings_errors('shift8_zoom_prefix');
-    settings_errors('shift8_zoom_css');
-    settings_errors('shift8_zoom_js');
-    settings_errors('shift8_zoom_media');
+    settings_errors('shift8_zoom_api_key');
+    settings_errors('shift8_zoom_api_secret');
+    settings_errors('shift8_zoom_user_email');
+    settings_errors('shift8_zoom_import_frequency');
+    settings_errors('shift8_zoom_filter_title');
     ?>
     </span></td>
 	</tr>
@@ -133,6 +133,14 @@ $plugin_name = $plugin_data['TextDomain'];
     </div>
     <div class="shift8-zoom-tooltip"><span class="dashicons dashicons-editor-help"></span>
         <span class="shift8-zoom-tooltiptext">This determines the frequency where we will pull new webinars from Zoom</span>
+    </div>
+    </td>
+    </tr>
+    <tr valign="top">
+    <th scope="row">Shift8 Zoom Filter Title : </th>
+    <td><input type="text" id="shift8_zoom_filter_title" name="shift8_zoom_filter_title" size="34" value="<?php echo (empty(esc_attr(get_option('shift8_zoom_filter_title'))) ? '' : esc_attr(get_option('shift8_zoom_filter_title'))); ?>">
+    <div class="shift8-zoom-tooltip"><span class="dashicons dashicons-editor-help"></span>
+        <span class="shift8-zoom-tooltiptext">Enter a text phrase for the webinar import process to ignore or skip webinars based on text matches of the webinar title</span>
     </div>
     </td>
     </tr>

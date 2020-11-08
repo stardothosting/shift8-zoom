@@ -314,48 +314,57 @@ function shift8_zoom_get_import_frequency_options() {
 
 // Function to import webinar data
 function shift8_zoom_import_webinars($webinar_data) {
+    // Import counter
     $import_count = 0;
+    // Obtain the title import filter
+    $import_filter = (empty(esc_attr(get_option('shift8_zoom_filter_title'))) ? false : esc_attr(get_option('shift8_zoom_filter_title')));
+
     if (is_array($webinar_data) && $webinar_data['webinars']) {
         foreach ($webinar_data['webinars'] as $webinar) {
-            // Check if the UUID exists already
-            $args = array(  
-                'post_type' => 'shift8_zoom',
-                'post_status' => 'publish',
-                'posts_per_page' => -1, 
-                'meta_query'     => array(
-                    array(
-                        'key'       => '_post_shift8_zoom_uuid',
-                        'value'     => sanitize_text_field($webinar['uuid']),
-                        'compare'   => '='
-                    )
-                ),
-                'order' => 'ASC', 
-            );
-            $query = new WP_Query ( $args );
-            // If UUID exists, move on
-            if ($query->have_posts()) {
+            // If the filter is present and a match is found in the title, skip
+            if ($import_filter && preg_match("/" . $import_filter . "/i", $webinar['topic'])) {
                 continue;
             } else {
-                // Create post object
-                $webinar_post = array(
-                    'post_title'    => wp_strip_all_tags( $webinar['topic'] ),
-                    'post_status'   => 'publish',
-                    'post_type'     => 'shift8_zoom',
-                    'post_author'   => 1,
+                // Check if the UUID exists already
+                $args = array(  
+                    'post_type' => 'shift8_zoom',
+                    'post_status' => 'publish',
+                    'posts_per_page' => -1, 
+                    'meta_query'     => array(
+                        array(
+                            'key'       => '_post_shift8_zoom_uuid',
+                            'value'     => sanitize_text_field($webinar['uuid']),
+                            'compare'   => '='
+                        )
+                    ),
+                    'order' => 'ASC', 
                 );
+                $query = new WP_Query ( $args );
+                // If UUID exists, move on
+                if ($query->have_posts()) {
+                    continue;
+                } else {
+                    // Create post object
+                    $webinar_post = array(
+                        'post_title'    => wp_strip_all_tags( $webinar['topic'] ),
+                        'post_status'   => 'publish',
+                        'post_type'     => 'shift8_zoom',
+                        'post_author'   => 1,
+                    );
 
-                // Insert the post into the database
-                $post_id = wp_insert_post( $webinar_post );
-                update_post_meta( $post_id, "_post_shift8_zoom_uuid", sanitize_text_field( $webinar['uuid']) );
-                update_post_meta( $post_id, "_post_shift8_zoom_id", sanitize_text_field( $webinar['id']) );
-                update_post_meta( $post_id, "_post_shift8_zoom_language", 'English' );
-                update_post_meta( $post_id, "_post_shift8_zoom_type", sanitize_text_field( $webinar['type']) );
-                update_post_meta( $post_id, "_post_shift8_zoom_start", wp_date(Carbon::create(sanitize_text_field( $webinar['start_time'] ))) );
-                update_post_meta( $post_id, "_post_shift8_zoom_duration", sanitize_text_field( $webinar['duration'] ) );
-                update_post_meta( $post_id, "_post_shift8_zoom_timezone", sanitize_text_field( $webinar['timezone'] ) );
-                update_post_meta( $post_id, "_post_shift8_zoom_joinurl", sanitize_url( $webinar['join_url'] ) );
-                update_post_meta( $post_id, "_post_shift8_zoom_agenda_html", sanitize_text_field( $webinar['agenda'] ) );
-                $import_count++;
+                    // Insert the post into the database
+                    $post_id = wp_insert_post( $webinar_post );
+                    update_post_meta( $post_id, "_post_shift8_zoom_uuid", sanitize_text_field( $webinar['uuid']) );
+                    update_post_meta( $post_id, "_post_shift8_zoom_id", sanitize_text_field( $webinar['id']) );
+                    update_post_meta( $post_id, "_post_shift8_zoom_language", 'English' );
+                    update_post_meta( $post_id, "_post_shift8_zoom_type", sanitize_text_field( $webinar['type']) );
+                    update_post_meta( $post_id, "_post_shift8_zoom_start", wp_date(Carbon::create(sanitize_text_field( $webinar['start_time'] ))) );
+                    update_post_meta( $post_id, "_post_shift8_zoom_duration", sanitize_text_field( $webinar['duration'] ) );
+                    update_post_meta( $post_id, "_post_shift8_zoom_timezone", sanitize_text_field( $webinar['timezone'] ) );
+                    update_post_meta( $post_id, "_post_shift8_zoom_joinurl", sanitize_url( $webinar['join_url'] ) );
+                    update_post_meta( $post_id, "_post_shift8_zoom_agenda_html", sanitize_text_field( $webinar['agenda'] ) );
+                    $import_count++;
+                }
             }
         }      
     }

@@ -30,6 +30,7 @@ function register_shift8_zoom_settings() {
     register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_api_key' );
     register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_api_secret' );
     register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_import_frequency', 'shift8_zoom_cron_validate');
+    register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_filter_title' );
     register_setting( 'shift8-zoom-settings-group', 'shift8_zoom_permalinks_flushed');
 }
 
@@ -48,6 +49,7 @@ function shift8_zoom_uninstall_hook() {
   delete_option('shift8_zoom_api_key');
   delete_option('shift8_zoom_api_secret');
   delete_option('shift8_zoom_import_frequency');
+  delete_option('shift8_zoom_filter_title');
   delete_option('shift8_zoom_permalinks_flushed');
 
   // Clear Cron tasks
@@ -80,6 +82,7 @@ function shift8_zoom_check_enabled() {
 function shift8_zoom_check_options() {
   $shift8_options = array();
   $shift8_options['zoom_user_email'] = sanitize_email( get_option('shift8_zoom_user_email') );
+  $shift8_options['zoom_filter_title'] = sanitize_email( get_option('shift8_zoom_filter_title') );
   $shift8_options['zoom_api_key'] = esc_attr( get_option('shift8_zoom_api_key') );
   $shift8_options['zoom_api_secret'] = esc_attr( get_option('shift8_zoom_api_secret') );
   $shift8_options['zoom_import_frequency'] = esc_attr( get_option('shift8_zoom_import_frequency') );
