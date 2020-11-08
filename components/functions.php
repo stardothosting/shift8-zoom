@@ -348,6 +348,7 @@ function shift8_zoom_import_webinars($webinar_data) {
                 $post_id = wp_insert_post( $webinar_post );
                 update_post_meta( $post_id, "_post_shift8_zoom_uuid", sanitize_text_field( $webinar['uuid']) );
                 update_post_meta( $post_id, "_post_shift8_zoom_id", sanitize_text_field( $webinar['id']) );
+                update_post_meta( $post_id, "_post_shift8_zoom_language", 'English' );
                 update_post_meta( $post_id, "_post_shift8_zoom_type", sanitize_text_field( $webinar['type']) );
                 update_post_meta( $post_id, "_post_shift8_zoom_start", wp_date(Carbon::create(sanitize_text_field( $webinar['start_time'] ))) );
                 update_post_meta( $post_id, "_post_shift8_zoom_duration", sanitize_text_field( $webinar['duration'] ) );
