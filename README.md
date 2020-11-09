@@ -4,7 +4,7 @@
 * Tags: zoom, webinar, shift8, import
 * Requires at least: 3.0.1
 * Tested up to: 5.5
-* Stable tag: 1.0.3
+* Stable tag: 1.0.4
 * License: GPLv3
 * License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -64,3 +64,6 @@ Visit the support forums here and let us know. We will try our best to help!
 
 ### 1.0.3
 * Added input option to add text string to filter webinar titles during import. User can add a string of text to scan during import process to filter webinars from being imported.
+
+### 1.0.4
+* Added some custom types for webinar custom field 

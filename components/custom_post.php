@@ -141,8 +141,15 @@ function shift8_zoom_post_meta_box(){
         case '9':
             $recurringFixedSelected = "selected";
             break;
-        case 'shift8_industry': // TEMP CUSTOM
-            $typeIndustrySelected = "selected";
+        // Custom types
+        case 'shift8_inperson': 
+            $inpersonSelected = "selected";
+            break;
+        case 'shift8_virtual': 
+            $virtualSelected = "selected";
+            break;
+        case 'shift8_tradeshow': 
+            $tradeshowSelected = "selected";
             break;
     }
     $zoom_start = $custom[ "_post_shift8_zoom_start" ][ 0 ];
@@ -160,10 +167,12 @@ function shift8_zoom_post_meta_box(){
       </select>
     <br />';
 	echo '<label>Type :</label><select name="_post_shift8_zoom_type"/>
+    <option value="shift8_inperson" ' . $inpersonSelected . '>In-person Event</option>
 		<option value="5" ' . $webinarSelected . '>Webinar</option>
+    <option value="shift8_virtual" ' . $virtualSelected . '>Virtual Event</option>
+    <option value="shift8_tradeshow" ' . $tradeshowSelected . '>Tradeshow</option>
 		<option value="6" ' . $recurringNoFixedSelected . '>Recurring webinar with no fixed time</option>
 		<option value="9" ' . $recurringFixedSelected . '>Recurring webinar with a fixed time</option>
-    <option value="shift8_industry" ' . $typeIndustrySelected . '>Industry</option>
 		</select>
 	<br />';
 	echo '<label>Start Time :</label><input type="text" name="_post_shift8_zoom_start" value="' . $zoom_start . '"/><br />';
