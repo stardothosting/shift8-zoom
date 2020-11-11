@@ -72,4 +72,4 @@ Visit the support forums here and let us know. We will try our best to help!
 * Show categories in post list
 
 ### 1.0.6
-* Show categories in post list
+* Full webinar agenda import now, separate api query
