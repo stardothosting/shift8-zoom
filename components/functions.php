@@ -256,9 +256,6 @@ function shift8_zoom_check() {
 // Custom Cron schedules outside of default WP Cron
 add_filter( 'cron_schedules', 'shift8_zoom_add_cron_interval' );
 function shift8_zoom_add_cron_interval( $schedules ) { 
-    $schedules['shift8_zoom_five'] = array(
-        'interval' => 5,
-        'display'  => esc_html__( 'Every Five Seconds' ), );
     $schedules['shift8_zoom_minute'] = array(
         'interval' => 60,
         'display'  => esc_html__( 'Every Sixty Seconds' ), );
@@ -303,8 +300,7 @@ function shift8_zoom_generate_jwt() {
 // Build 
 function shift8_zoom_get_import_frequency_options() {
     $import_frequency = array(
-        'shift8_zoom_five' => 'Every 5 seconds',
-        'shift8_zoom_minute' => 'Every minute',
+        //'shift8_zoom_minute' => 'Every minute',
         'hourly' => 'Hourly',
         'twicedaily' => 'Twice Daily',
         'daily' => 'Daily',
@@ -354,6 +350,12 @@ function shift8_zoom_import_webinars($webinar_data) {
                         'post_author'   => 1,
                     );
 
+                    // Have to get the agenda text separately as the list webinar api query limits it to 250 characters
+                    $webinar_agenda = shift8_zoom_webinar_agenda(sanitize_text_field($webinar['id']));
+                    if (!$webinar_agenda) { 
+                        $webinar_agenda = sanitize_text_field( $webinar['agenda'] );
+                    }
+
                     // Insert the post into the database
                     $post_id = wp_insert_post( $webinar_post );
                     update_post_meta( $post_id, "_post_shift8_zoom_uuid", sanitize_text_field( $webinar['uuid']) );
@@ -364,11 +366,41 @@ function shift8_zoom_import_webinars($webinar_data) {
                     update_post_meta( $post_id, "_post_shift8_zoom_duration", sanitize_text_field( $webinar['duration'] ) );
                     update_post_meta( $post_id, "_post_shift8_zoom_timezone", sanitize_text_field( $webinar['timezone'] ) );
                     update_post_meta( $post_id, "_post_shift8_zoom_joinurl", sanitize_url( $webinar['join_url'] ) );
-                    update_post_meta( $post_id, "_post_shift8_zoom_agenda_html", sanitize_text_field( $webinar['agenda'] ) );
+                    update_post_meta( $post_id, "_post_shift8_zoom_agenda_html", $webinar_agenda );
                     $import_count++;
                 }
             }
         }      
     }
     return $import_count;
+}
+
+// Get the agenda info because it is truncated in the agenda list API query
+function shift8_zoom_webinar_agenda($webinar_id) {
+    $zoom_jwt_token = shift8_zoom_generate_jwt();
+
+     // Set headers for WP Remote post
+    $headers = array(
+        'Content-type: application/json',
+        'Authorization' => 'Bearer ' . $zoom_jwt_token,
+    );
+
+    // Use WP Remote Get to poll the zoom api 
+    $response = wp_remote_get( S8ZOOM_API . '/v2/webinars/' . intval($webinar_id),
+        array(
+            'method' => 'GET',
+            'headers' => $headers,
+            'httpversion' => '1.1',
+            'timeout' => '45',
+            'blocking' => true,
+        )
+    );
+    // Deal with the response
+    if (is_object(json_decode($response['body']))) {
+        // Pass the returned webinars to a function to handle the import
+        return sanitize_text_field(json_decode($response['body'])->agenda);
+
+    } else {
+        return false;
+    }
 }
