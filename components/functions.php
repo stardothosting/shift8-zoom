@@ -303,6 +303,8 @@ function shift8_zoom_generate_jwt() {
 // Build 
 function shift8_zoom_get_import_frequency_options() {
     $import_frequency = array(
+        'shift8_zoom_five' => 'Every 5 seconds',
+        'shift8_zoom_minute' => 'Every minute',
         'hourly' => 'Hourly',
         'twicedaily' => 'Twice Daily',
         'daily' => 'Daily',

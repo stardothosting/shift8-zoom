@@ -86,6 +86,7 @@ function shift8_zoom_taxonomies_webinar() {
     array(
       'hierarchical' => true,
       'label' => 'Categories', // display name
+      'show_admin_column' => true,
       'query_var' => true,
       'rewrite' => array(
         'slug' => 'zoom',    // This controls the base slug that will display before each term
