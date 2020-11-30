@@ -330,7 +330,7 @@ function shift8_zoom_import_webinars($webinar_data) {
                     'posts_per_page' => -1, 
                     'meta_query'     => array(
                         array(
-                            'key'       => '_post_shift8_zoom_uuid',
+                            'key'       => '_post_shift8_zoom_id',
                             'value'     => sanitize_text_field($webinar['id']),
                             'compare'   => '='
                         )
@@ -338,7 +338,7 @@ function shift8_zoom_import_webinars($webinar_data) {
                     'order' => 'ASC', 
                 );
                 $query = new WP_Query ( $args );
-                // If UUID exists, move on
+                // If ID exists, move on
                 if ($query->have_posts()) {
                     continue;
                 } else {
