@@ -4,7 +4,7 @@
 * Tags: zoom, webinar, shift8, import
 * Requires at least: 3.0.1
 * Tested up to: 5.5
-* Stable tag: 1.0.6
+* Stable tag: 1.0.7
 * License: GPLv3
 * License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -73,3 +73,6 @@ Visit the support forums here and let us know. We will try our best to help!
 
 = 1.0.6 =
 * Importing full webinar agenda information now
+
+= 1.0.7 =
+* Adjust post type slug to events

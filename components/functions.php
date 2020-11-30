@@ -348,6 +348,7 @@ function shift8_zoom_import_webinars($webinar_data) {
                         'post_status'   => 'publish',
                         'post_type'     => 'shift8_zoom',
                         'post_author'   => 1,
+                        //'post_date'     => wp_date(Carbon::create(sanitize_text_field( $webinar['start_time'] ))),
                     );
 
                     // Have to get the agenda text separately as the list webinar api query limits it to 250 characters
