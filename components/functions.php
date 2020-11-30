@@ -354,7 +354,7 @@ function shift8_zoom_import_webinars($webinar_data) {
                     // Have to get the agenda text separately as the list webinar api query limits it to 250 characters
                     $webinar_agenda = shift8_zoom_webinar_agenda(sanitize_text_field($webinar['id']));
                     if (!$webinar_agenda) { 
-                        $webinar_agenda = sanitize_text_field( $webinar['agenda'] );
+                        $webinar_agenda = shift8_zoom_wp_kses( $webinar['agenda'] );
                     }
 
                     // Insert the post into the database
@@ -399,9 +399,28 @@ function shift8_zoom_webinar_agenda($webinar_id) {
     // Deal with the response
     if (is_object(json_decode($response['body']))) {
         // Pass the returned webinars to a function to handle the import
-        return sanitize_text_field(json_decode($response['body'])->agenda);
+        return shift8_zoom_wp_kses(json_decode($response['body'])->agenda);
 
     } else {
         return false;
     }
+}
+
+// Centralized function to filter HTML, specifically for the agenda details
+function shift8_zoom_wp_kses($string) {
+    $allowed_html = array(
+        'a' => array(
+            'href' => array(),
+            'title' => array()
+        ),
+        'br' => array(),
+        'em' => array(),
+        'strong' => array(),
+        'ul' => array(),
+        'li' => array(),
+        'ol' => array(),
+        'b' => array(),
+        'p' => array(),
+    );
+    return wp_kses($string, $allowed_html);
 }

@@ -112,7 +112,7 @@ function shift8_zoom_save_post_meta_boxes(){
     update_post_meta( $post->ID, "_post_shift8_zoom_duration", sanitize_text_field( $_POST[ "_post_shift8_zoom_duration" ] ) );
     update_post_meta( $post->ID, "_post_shift8_zoom_timezone", sanitize_text_field( $_POST[ "_post_shift8_zoom_timezone" ] ) );
     update_post_meta( $post->ID, "_post_shift8_zoom_joinurl", sanitize_url( $_POST[ "_post_shift8_zoom_joinurl" ] ) );
-    update_post_meta( $post->ID, "_post_shift8_zoom_agenda_html", sanitize_text_field( $_POST[ "_post_shift8_zoom_agenda_html" ] ) );
+    update_post_meta( $post->ID, "_post_shift8_zoom_agenda_html", shift8_zoom_wp_kses( $_POST[ "_post_shift8_zoom_agenda_html" ] ) );
 }
 add_action( 'save_post', 'shift8_zoom_save_post_meta_boxes' );
 
