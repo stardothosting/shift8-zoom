@@ -77,7 +77,7 @@ function shift8_zoom_poll($shift8_action) {
         // Check values with dashboard
         if ($shift8_action == 'check') {
             // Use WP Remote Get to poll the zoom api 
-            $response = wp_remote_get( S8ZOOM_API . '/v2/users/' . $zoom_user_email . '/webinars',
+            $response = wp_remote_get( S8ZOOM_API . '/v2/users/' . $zoom_user_email . '/webinars' . S8ZOOM_WEBINAR_PARAMETERS ,
                 array(
                     'method' => 'GET',
                     'headers' => $headers,
@@ -107,7 +107,7 @@ function shift8_zoom_poll($shift8_action) {
             } 
         } else if ($shift8_action == 'import') {
             // Use WP Remote Get to poll the zoom api 
-            $response = wp_remote_get( S8ZOOM_API . '/v2/users/' . $zoom_user_email . '/webinars',
+            $response = wp_remote_get( S8ZOOM_API . '/v2/users/' . $zoom_user_email . '/webinars' . S8ZOOM_WEBINAR_PARAMETERS,
                 array(
                     'method' => 'GET',
                     'headers' => $headers,
@@ -228,7 +228,7 @@ function shift8_zoom_check() {
     );
 
     // Use WP Remote Get to poll the zoom api 
-    $response = wp_remote_get( S8ZOOM_API . '/v2/users/' . $zoom_user_email . '/webinars',
+    $response = wp_remote_get( S8ZOOM_API . '/v2/users/' . $zoom_user_email . '/webinars' . S8ZOOM_WEBINAR_PARAMETERS,
         array(
             'method' => 'GET',
             'headers' => $headers,

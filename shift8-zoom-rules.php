@@ -16,3 +16,5 @@ if ( !defined( 'S8ZOOM_DIR' ) )
     define( 'S8ZOOM_DIR', realpath( dirname( __FILE__ ) ) );
 
 define( 'S8ZOOM_API' , 'https://api.zoom.us');
+
+define( 'S8ZOOM_WEBINAR_PARAMETERS' , '?page_size=300' );
