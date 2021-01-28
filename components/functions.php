@@ -7,6 +7,7 @@
  */
 use \Firebase\JWT\JWT;
 use Carbon\Carbon;
+use Carbon\CarbonTimeZone;
 
 if ( !defined( 'ABSPATH' ) ) {
     die();
@@ -357,8 +358,9 @@ function shift8_zoom_import_webinars($webinar_data) {
                         $webinar_agenda = shift8_zoom_wp_kses( $webinar['agenda'] );
                     }
 
-                    // Adjust the timezone
+                    // Adjust the start time and timezone
                     $webinar_datetime = Carbon::create(sanitize_text_field( $webinar['start_time']))->setTimezone('UTC');
+                    $webinar_timezone = strtoupper(CarbonTimeZone::create(sanitize_text_field( $webinar['timezone'] ))->getAbbr());
 
                     // Insert the post into the database
                     $post_id = wp_insert_post( $webinar_post );
@@ -368,7 +370,7 @@ function shift8_zoom_import_webinars($webinar_data) {
                     update_post_meta( $post_id, "_post_shift8_zoom_type", sanitize_text_field( $webinar['type']) );
                     update_post_meta( $post_id, "_post_shift8_zoom_start", wp_date($webinar_datetime->setTimezone(sanitize_text_field( $webinar['timezone'] ))) );
                     update_post_meta( $post_id, "_post_shift8_zoom_duration", sanitize_text_field( $webinar['duration'] ) );
-                    update_post_meta( $post_id, "_post_shift8_zoom_timezone", sanitize_text_field( $webinar['timezone'] ) );
+                    update_post_meta( $post_id, "_post_shift8_zoom_timezone", sanitize_text_field( $webinar_timezone ) );
                     update_post_meta( $post_id, "_post_shift8_zoom_joinurl", sanitize_url( $webinar['join_url'] ) );
                     update_post_meta( $post_id, "_post_shift8_zoom_agenda_html", $webinar_agenda );
                     $import_count++;
