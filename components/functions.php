@@ -353,9 +353,9 @@ function shift8_zoom_import_webinars($webinar_data) {
                     );
 
                     // Have to get the agenda text separately as the list webinar api query limits it to 250 characters
-                    $webinar_agenda = shift8_zoom_webinar_agenda(sanitize_text_field($webinar['id']));
-                    if (!$webinar_agenda) { 
-                        $webinar_agenda = shift8_zoom_wp_kses( $webinar['agenda'] );
+                    $webinar_data = shift8_zoom_webinar_data(sanitize_text_field($webinar['id']));
+                    if (!$webinar_data['agenda']) { 
+                        $webinar_data['agenda'] = shift8_zoom_wp_kses( $webinar['agenda'] );
                     }
 
                     // Adjust the start time and timezone
@@ -371,8 +371,8 @@ function shift8_zoom_import_webinars($webinar_data) {
                     update_post_meta( $post_id, "_post_shift8_zoom_start", wp_date($webinar_datetime->setTimezone(sanitize_text_field( $webinar['timezone'] ))) );
                     update_post_meta( $post_id, "_post_shift8_zoom_duration", sanitize_text_field( $webinar['duration'] ) );
                     update_post_meta( $post_id, "_post_shift8_zoom_timezone", sanitize_text_field( $webinar_timezone ) );
-                    update_post_meta( $post_id, "_post_shift8_zoom_joinurl", sanitize_url( $webinar['join_url'] ) );
-                    update_post_meta( $post_id, "_post_shift8_zoom_agenda_html", $webinar_agenda );
+                    update_post_meta( $post_id, "_post_shift8_zoom_joinurl", $webinar_data['registration_url'] );
+                    update_post_meta( $post_id, "_post_shift8_zoom_agenda_html", $webinar_data['agenda'] );
                     $import_count++;
                 }
             }
@@ -382,7 +382,7 @@ function shift8_zoom_import_webinars($webinar_data) {
 }
 
 // Get the agenda info because it is truncated in the agenda list API query
-function shift8_zoom_webinar_agenda($webinar_id) {
+function shift8_zoom_webinar_data($webinar_id) {
     $zoom_jwt_token = shift8_zoom_generate_jwt();
 
      // Set headers for WP Remote post
@@ -404,7 +404,10 @@ function shift8_zoom_webinar_agenda($webinar_id) {
     // Deal with the response
     if (is_object(json_decode($response['body']))) {
         // Pass the returned webinars to a function to handle the import
-        return shift8_zoom_wp_kses(json_decode($response['body'])->agenda);
+        return array(
+            'agenda' => shift8_zoom_wp_kses(json_decode($response['body'])->agenda),
+            'registration_url' => sanitize_url(json_decode($response['body'])->registration_url),
+        );
 
     } else {
         return false;
