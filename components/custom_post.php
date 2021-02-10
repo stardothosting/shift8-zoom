@@ -107,7 +107,6 @@ function shift8_zoom_save_post_meta_boxes(){
         return;
     }
     update_post_meta( $post->ID, "_post_shift8_zoom_type", sanitize_text_field( $_POST[ "_post_shift8_zoom_type" ] ) );
-    update_post_meta( $post->ID, "_post_shift8_zoom_language", sanitize_text_field( $_POST[ "_post_shift8_zoom_language" ] ) );
     update_post_meta( $post->ID, "_post_shift8_zoom_start", sanitize_text_field( $_POST[ "_post_shift8_zoom_start" ] ) );
     update_post_meta( $post->ID, "_post_shift8_zoom_duration", sanitize_text_field( $_POST[ "_post_shift8_zoom_duration" ] ) );
     update_post_meta( $post->ID, "_post_shift8_zoom_timezone", sanitize_text_field( $_POST[ "_post_shift8_zoom_timezone" ] ) );
@@ -122,15 +121,6 @@ function shift8_zoom_post_meta_box(){
     $custom = get_post_custom( $post->ID );
     $zoom_uuid = $custom[ "_post_shift8_zoom_uuid" ][ 0 ];
     $zoom_id = $custom[ "_post_shift8_zoom_id" ][ 0 ];
-    $zoom_lang = $custom[ "_post_shift8_zoom_language" ][ 0 ];
-    switch ( $zoom_lang ) {
-        case 'English':
-            $englishSelected = "selected";
-            break;
-        case 'French':
-            $frenchSelected = "selected";
-            break;
-    }
     $zoom_type = $custom[ "_post_shift8_zoom_type" ][ 0 ];
     switch ( $zoom_type ) {
         case '5':
@@ -162,12 +152,7 @@ function shift8_zoom_post_meta_box(){
     echo '<div class="shift8-zoom-admin-custom-fields">';
     echo '<label>UUID :</label><input type="text" name="_post_shift8_zoom_uuid" value="'. $zoom_uuid . '" readonly/>';
     echo '<label>ID :</label><input type="text" name="_post_shift8_zoom_id" value="' . $zoom_id . '" readonly/><br />';
-    echo '<label>Language :</label><select name="_post_shift8_zoom_language"/>
-      <option value="English" ' . $englishSelected . '>English</option>
-      <option value="French" ' . $frenchSelected . '>French</option>
-      </select>
-    <br />';
-	echo '<label>Type :</label><select name="_post_shift8_zoom_type"/>
+	  echo '<label>Type :</label><select name="_post_shift8_zoom_type"/>
     <option value="shift8_inperson" ' . $inpersonSelected . '>In-person Event</option>
 		<option value="5" ' . $webinarSelected . '>Webinar</option>
     <option value="shift8_virtual" ' . $virtualSelected . '>Virtual Event</option>
@@ -175,12 +160,12 @@ function shift8_zoom_post_meta_box(){
 		<option value="6" ' . $recurringNoFixedSelected . '>Recurring webinar with no fixed time</option>
 		<option value="9" ' . $recurringFixedSelected . '>Recurring webinar with a fixed time</option>
 		</select>
-	<br />';
-	echo '<label>Start Time :</label><input type="text" name="_post_shift8_zoom_start" value="' . $zoom_start . '"/><br />';
-	echo '<label>Duration :</label><input type="text" name="_post_shift8_zoom_duration" value="' . $zoom_duration . '"/><br />';
-	echo '<label>Timezone :</label><input type="text" name="_post_shift8_zoom_timezone" value="' . $zoom_timezone . '"/><br />';
-	echo '<label>Register URL :</label><input type="text" name="_post_shift8_zoom_joinurl" value="' . $zoom_joinurl . '"/><br /><br />';
-	echo '<label><b>Agenda Details :</b></label><br /><br />';
+	  <br />';
+  	echo '<label>Start Time :</label><input type="text" name="_post_shift8_zoom_start" value="' . $zoom_start . '"/><br />';
+  	echo '<label>Duration :</label><input type="text" name="_post_shift8_zoom_duration" value="' . $zoom_duration . '"/><br />';
+  	echo '<label>Timezone :</label><input type="text" name="_post_shift8_zoom_timezone" value="' . $zoom_timezone . '"/><br />';
+  	echo '<label>Register URL :</label><input type="text" name="_post_shift8_zoom_joinurl" value="' . $zoom_joinurl . '"/><br /><br />';
+  	echo '<label><b>Agenda Details :</b></label><br /><br />';
     wp_editor(
         htmlspecialchars_decode( $zoom_agenda ),
         '_post_shift8_zoom_agenda_html',
