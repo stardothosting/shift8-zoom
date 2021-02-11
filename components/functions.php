@@ -318,6 +318,13 @@ function shift8_zoom_import_webinars($webinar_data) {
     // Obtain the title import filter
     $import_filter = (empty(esc_attr(get_option('shift8_zoom_filter_title'))) ? false : esc_attr(get_option('shift8_zoom_filter_title')));
 
+    // WPML Force import to be english as the language is set manually
+    if ( function_exists('icl_object_id') ) {
+        global $sitepress; 
+        $lang='en';
+        $sitepress->switch_lang($lang);
+    }
+
     if (is_array($webinar_data) && $webinar_data['webinars']) {
         foreach ($webinar_data['webinars'] as $webinar) {
             // If the filter is present and a match is found in the title, skip
@@ -328,7 +335,8 @@ function shift8_zoom_import_webinars($webinar_data) {
                 $args = array(  
                     'post_type' => 'shift8_zoom',
                     'post_status' => 'publish',
-                    'posts_per_page' => -1, 
+                    'posts_per_page' => -1,
+                    'suppress_filters' => true,
                     'meta_query'     => array(
                         array(
                             'key'       => '_post_shift8_zoom_id',
