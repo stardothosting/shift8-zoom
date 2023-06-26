@@ -22,7 +22,7 @@ function register_shift8_zoom_post_type() {
       'all_items'          => 'All Webinars',
       'view_item'          => 'View Webinar',
       'search_items'       => 'Search Webinars',
-      'not_found'          =>  'No webinars found',
+      'not_found'          => 'No webinars found',
       'not_found_in_trash' => 'No webinars found in Trash',
       'parent_item_colon'  => '',
       'menu_name'          => 'Shift8 Zoom'
@@ -111,6 +111,8 @@ function shift8_zoom_save_post_meta_boxes(){
     update_post_meta( $post->ID, "_post_shift8_zoom_duration", sanitize_text_field( $_POST[ "_post_shift8_zoom_duration" ] ) );
     update_post_meta( $post->ID, "_post_shift8_zoom_timezone", sanitize_text_field( $_POST[ "_post_shift8_zoom_timezone" ] ) );
     update_post_meta( $post->ID, "_post_shift8_zoom_joinurl", sanitize_url( $_POST[ "_post_shift8_zoom_joinurl" ] ) );
+    update_post_meta( $post->ID, "_post_shift8_zoom_registerurl", sanitize_url( $_POST[ "_post_shift8_zoom_registerurl" ] ) );
+
     update_post_meta( $post->ID, "_post_shift8_zoom_agenda_html", shift8_zoom_wp_kses( $_POST[ "_post_shift8_zoom_agenda_html" ] ) );
 }
 add_action( 'save_post', 'shift8_zoom_save_post_meta_boxes' );
@@ -147,6 +149,7 @@ function shift8_zoom_post_meta_box(){
     $zoom_duration = $custom[ "_post_shift8_zoom_duration" ][ 0 ];
     $zoom_timezone = $custom[ "_post_shift8_zoom_timezone" ][ 0 ];
     $zoom_joinurl = $custom[ "_post_shift8_zoom_joinurl" ][ 0 ];
+    $zoom_registerurl = $custom[ "_post_shift8_zoom_registerurl" ][ 0 ];
     $zoom_agenda = $custom[ "_post_shift8_zoom_agenda_html" ][ 0 ];
 
     echo '<div class="shift8-zoom-admin-custom-fields">';
@@ -164,7 +167,8 @@ function shift8_zoom_post_meta_box(){
   	echo '<label>Start Time :</label><input type="text" name="_post_shift8_zoom_start" value="' . $zoom_start . '"/><br />';
   	echo '<label>Duration :</label><input type="text" name="_post_shift8_zoom_duration" value="' . $zoom_duration . '"/><br />';
   	echo '<label>Timezone :</label><input type="text" name="_post_shift8_zoom_timezone" value="' . $zoom_timezone . '"/><br />';
-  	echo '<label>Register URL :</label><input type="text" name="_post_shift8_zoom_joinurl" value="' . $zoom_joinurl . '"/><br /><br />';
+  	echo '<label>Join URL :</label><input type="text" name="_post_shift8_zoom_joinurl" value="' . $zoom_joinurl . '"/><br />';
+    echo '<label>Register URL :</label><input type="text" name="_post_shift8_zoom_registerurl" value="' . $zoom_registerurl . '"/><br /><br />';
   	echo '<label><b>Agenda Details :</b></label><br /><br />';
     wp_editor(
         htmlspecialchars_decode( $zoom_agenda ),
