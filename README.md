@@ -4,7 +4,7 @@
 * Tags: zoom, webinar, shift8, import
 * Requires at least: 3.0.1
 * Tested up to: 6.2
-* Stable tag: 1.0.15
+* Stable tag: 1.0.17
 * License: GPLv3
 * License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -103,3 +103,6 @@ Visit the support forums here and let us know. We will try our best to help!
 
 ### 1.0.16
 * Adjustment of Register to Join URL
+
+### 1.0.17
+* Remove join url
