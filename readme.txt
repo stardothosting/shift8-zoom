@@ -4,7 +4,7 @@
 * Tags: zoom, webinar, shift8, import
 * Requires at least: 3.0.1
 * Tested up to: 6.6
-* Stable tag: 1.1.1
+* Stable tag: 1.1.2
 * License: GPLv3
 * License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -115,4 +115,7 @@ Visit the support forums here and let us know. We will try our best to help!
 * Switch from JWT to Oauth server-to-server authentication
 
 = 1.1.1 = 
+* Updated readme
+
+= 1.1.2 = 
 * Updated readme
