@@ -69,9 +69,10 @@ $plugin_name = $plugin_data['TextDomain'];
     <td><span id="shift8-zoom-notice">
     <?php 
     settings_errors('shift8_zoom_url');
-    settings_errors('shift8_zoom_api_key');
-    settings_errors('shift8_zoom_api_secret');
     settings_errors('shift8_zoom_user_email');
+    settings_errors('shift8_zoom_client_id');
+    settings_errors('shift8_zoom_client_secret');
+    settings_errors('shift8_zoom_account_id');
     settings_errors('shift8_zoom_import_frequency');
     settings_errors('shift8_zoom_filter_title');
     ?>
@@ -101,22 +102,26 @@ $plugin_name = $plugin_data['TextDomain'];
     </div>
     </td>
     </tr>
-	<tr valign="top">
-    <th scope="row">Shift8 Zoom API Key : </th>
-    <td><input type="password" id="shift8_zoom_api_key_field" name="shift8_zoom_api_key" size="34" value="<?php echo (empty(esc_attr(get_option('shift8_zoom_api_key'))) ? '' : esc_attr(get_option('shift8_zoom_api_key'))); ?>">
-    <div class="shift8-zoom-tooltip"><span class="dashicons dashicons-editor-help"></span>
-        <span class="shift8-zoom-tooltiptext">Create a JWT app in your Zoom account to get this</span>
-    </div>
-    </td>
-	</tr>
-	<tr valign="top">
-    <th scope="row">Shift8 Zoom API Secret : </th>
-    <td><input type="password" id="shift8_zoom_api_secret_field" name="shift8_zoom_api_secret" size="34" value="<?php echo (empty(esc_attr(get_option('shift8_zoom_api_secret'))) ? '' : esc_attr(get_option('shift8_zoom_api_secret'))); ?>">
-    <div class="shift8-zoom-tooltip"><span class="dashicons dashicons-editor-help"></span>
-        <span class="shift8-zoom-tooltiptext">Create a JWT app in your Zoom account to get this</span>
-    </div>
-    </td>
-	</tr>
+    <tr valign="top">
+        <th scope="row">Client ID</th>
+        <td>
+            <input type="text" name="shift8_zoom_client_id" value="<?php echo esc_attr(get_option('shift8_zoom_client_id')); ?>" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <th scope="row">Client Secret</th>
+        <td>
+            <input type="text" name="shift8_zoom_client_secret" value="<?php echo esc_attr(get_option('shift8_zoom_client_secret')); ?>" />
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <th scope="row">Account ID</th>
+        <td>
+            <input type="text" name="shift8_zoom_account_id" value="<?php echo esc_attr(get_option('shift8_zoom_account_id')); ?>" />
+        </td>
+    </tr>
     <tr valign="top">
     <th scope="row">Select Zoom Webinar Import Frequency : </th>
     <td>
@@ -147,11 +152,8 @@ $plugin_name = $plugin_data['TextDomain'];
     <tr valign="top">
     <td width="226px"><div class="shift8-zoom-spinner"></div></td>
     <td>
-    <?php if (empty(esc_attr(get_option('shift8_zoom_api_key'))) || empty(esc_attr(get_option('shift8_zoom_api_secret')))) { ?>
-    <div class="shift8-zoom-prereg-note">Note : You need to register a Zoom JWT app first to get the above values. Once you save the API Key and Secret, a check button will appear to check the connection.</div>
-    <?php } ?>
     <ul class="shift8-zoom-controls">
-    <?php if (!empty(esc_attr(get_option('shift8_zoom_api_key')) && esc_attr(get_option('shift8_zoom_api_secret')))) { ?>
+    <?php if (!empty(esc_attr(get_option('shift8_zoom_client_id')) && esc_attr(get_option('shift8_zoom_client_secret')))) { ?>
     <li>
     <div class="shift8-zoom-button-container">
     <a id="shift8-zoom-check" href="<?php echo wp_nonce_url( admin_url('admin-ajax.php?action=shift8_zoom_push'), 'process'); ?>"><button class="shift8-zoom-button shift8-zoom-button-check">Test</button></a>

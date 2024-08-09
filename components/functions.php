@@ -5,7 +5,6 @@
  * Collection of functions used throughout the operation of the plugin
  *
  */
-use \Firebase\JWT\JWT;
 use Carbon\Carbon;
 use Carbon\CarbonTimeZone;
 
@@ -67,13 +66,14 @@ function shift8_zoom_poll($shift8_action) {
         global $shift8_zoom_table_name;
         $current_user = wp_get_current_user();
 
-        $zoom_jwt_token = shift8_zoom_generate_jwt();
+        $zoom_access_token = shift8_zoom_check_access_token();
         $zoom_user_email = sanitize_email(get_option('shift8_zoom_user_email'));
+
 
         // Set headers for WP Remote post
         $headers = array(
             'Content-type: application/json',
-            'Authorization' => 'Bearer ' . $zoom_jwt_token,
+            'Authorization' => 'Bearer ' . $zoom_access_token,
         );
         // Check values with dashboard
         if ($shift8_action == 'check') {
@@ -142,8 +142,6 @@ function shift8_zoom_poll($shift8_action) {
         }
     } 
 }
-
-
 
 // Functions to produce debugging information
 function shift8_zoom_debug_get_php_info() {
@@ -219,13 +217,13 @@ function shift8_zoom_debug_version_check() {
 // Check user plan options
 add_action( 'shift8_zoom_cron_hook', 'shift8_zoom_check' );
 function shift8_zoom_check() {
-    $zoom_jwt_token = shift8_zoom_generate_jwt();
+    $zoom_access_token = shift8_zoom_check_access_token();
     $zoom_user_email = sanitize_email(get_option('shift8_zoom_user_email'));
 
      // Set headers for WP Remote post
     $headers = array(
         'Content-type: application/json',
-        'Authorization' => 'Bearer ' . $zoom_jwt_token,
+        'Authorization' => 'Bearer ' . $zoom_access_token,
     );
 
     // Use WP Remote Get to poll the zoom api 
@@ -259,7 +257,7 @@ add_filter( 'cron_schedules', 'shift8_zoom_add_cron_interval' );
 function shift8_zoom_add_cron_interval( $schedules ) { 
     $schedules['shift8_zoom_minute'] = array(
         'interval' => 60,
-        'display'  => esc_html__( 'Every Sixty Seconds' ), );
+        'display'  => esc_html__( 'Every Sixty Seconds' ), ); 
     $schedules['shift8_zoom_halfhour'] = array(
         'interval' => 1800,
         'display'  => esc_html__( 'Every 30 minutes' ), );
@@ -283,21 +281,6 @@ if (shift8_zoom_check_enabled()) {
 
 shift8_zoom_write_log(wp_next_scheduled( 'shift8_zoom_cron_hook' ) );
 
-// Generate JWT Token 
-function shift8_zoom_generate_jwt() {
-    $key = esc_attr(get_option('shift8_zoom_api_key'));
-    $secret = esc_attr(get_option('shift8_zoom_api_secret'));
-    $header = array(
-        'typ' => 'JWT', 
-        'alg' => 'HS256'
-    );
-    $payload = array(
-        "iss" => $key,
-        "exp" => 1496091964000,
-    );
-    $jwt = JWT::encode($payload, $secret);
-    return $jwt;
-}
 // Build 
 function shift8_zoom_get_import_frequency_options() {
     $import_frequency = array(
@@ -310,6 +293,44 @@ function shift8_zoom_get_import_frequency_options() {
     return $import_frequency;
 }
 
+// Get oauth access token
+function shift8_zoom_get_access_token() {
+    $client_id = get_option('shift8_zoom_client_id');
+    $client_secret = get_option('shift8_zoom_client_secret');
+    $account_id = get_option('shift8_zoom_account_id');
+
+    $response = wp_remote_post('https://zoom.us/oauth/token', array(
+        'body' => array(
+            'grant_type' => 'account_credentials',
+            'account_id' => $account_id,
+        ),
+        'headers' => array(
+            'Authorization' => 'Basic ' . base64_encode("{$client_id}:{$client_secret}"),
+        ),
+    ));
+
+    $body = json_decode(wp_remote_retrieve_body($response), true);
+
+    if (isset($body['access_token'])) {
+        update_option('shift8_zoom_access_token', $body['access_token']);
+        update_option('shift8_zoom_token_expires', time() + $body['expires_in']);
+        return $body['access_token'];
+    }
+
+    return null;
+}
+
+// Check access token
+function shift8_zoom_check_access_token() {
+    $access_token = get_option('shift8_zoom_access_token');
+    $expires_at = get_option('shift8_zoom_token_expires');
+
+    if (!$access_token || time() >= $expires_at) {
+        return shift8_zoom_get_access_token();
+    }
+
+    return $access_token;
+}
 
 // Function to import webinar data
 function shift8_zoom_import_webinars($webinar_data) {
@@ -390,12 +411,12 @@ function shift8_zoom_import_webinars($webinar_data) {
 
 // Get the agenda info because it is truncated in the agenda list API query
 function shift8_zoom_webinar_data($webinar_id) {
-    $zoom_jwt_token = shift8_zoom_generate_jwt();
+    $zoom_access_token = shift8_zoom_check_access_token();
 
      // Set headers for WP Remote post
     $headers = array(
         'Content-type: application/json',
-        'Authorization' => 'Bearer ' . $zoom_jwt_token,
+        'Authorization' => 'Bearer ' . $zoom_access_token,
     );
 
     // Use WP Remote Get to poll the zoom api 
