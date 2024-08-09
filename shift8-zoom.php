@@ -3,7 +3,7 @@
  * Plugin Name: Shift8 Zoom
  * Plugin URI: https://github.com/stardothosting/shift8-zoom
  * Description: Plugin that imports Zoom webinars into custom content or existing content
- * Version: 1.0.18
+ * Version: 1.1.0
  * Author: Shift8 Web 
  * Author URI: https://www.shift8web.ca
  * License: GPLv3
