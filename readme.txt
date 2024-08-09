@@ -4,7 +4,7 @@
 * Tags: zoom, webinar, shift8, import
 * Requires at least: 3.0.1
 * Tested up to: 6.6
-* Stable tag: 1.1.0
+* Stable tag: 1.1.1
 * License: GPLv3
 * License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -14,9 +14,9 @@ This is a plugin that integrates into your Zoom account and will facilitate impo
 
 1. Register or set up your zoom account
 2. Once your account is activated, go to App marketplace and click "build app"
-3. Create a JWT app and copy down the API key and API secret
+3. Create a Server-To-Server Oauth app and copy down the client ID , client secret and account ID
 6. Install this Wordpress plugin and activate
-7. Go to the plugin settings page (Shift8 > Zoom Settings) and enter the API key and API secret and then click "Save Changes"
+7. Go to the plugin settings page (Shift8 > Zoom Settings) and enter the id, secret and account ID  and then click "Save Changes"
 8. Once saved, you can click the "Check" button to ensure we can connect to the Zoom API successfully
 
 == Want to see the plugin in action? ==
@@ -113,3 +113,6 @@ Visit the support forums here and let us know. We will try our best to help!
 = 1.1.0 = 
 * Wordpress 6.6 compatibility
 * Switch from JWT to Oauth server-to-server authentication
+
+= 1.1.1 = 
+* Updated readme
