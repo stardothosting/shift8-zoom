@@ -103,25 +103,68 @@ function shift8_zoom_save_post_meta_boxes(){
     if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
         return;
     }
+    if ( !$post || !isset( $post->ID ) ) {
+        return;
+    }
     if ( get_post_status( $post->ID ) === 'auto-draft' ) {
         return;
     }
-    update_post_meta( $post->ID, "_post_shift8_zoom_type", sanitize_text_field( $_POST[ "_post_shift8_zoom_type" ] ) );
-    update_post_meta( $post->ID, "_post_shift8_zoom_start", sanitize_text_field( $_POST[ "_post_shift8_zoom_start" ] ) );
-    update_post_meta( $post->ID, "_post_shift8_zoom_duration", sanitize_text_field( $_POST[ "_post_shift8_zoom_duration" ] ) );
-    update_post_meta( $post->ID, "_post_shift8_zoom_timezone", sanitize_text_field( $_POST[ "_post_shift8_zoom_timezone" ] ) );
-    update_post_meta( $post->ID, "_post_shift8_zoom_joinurl", sanitize_url( $_POST[ "_post_shift8_zoom_joinurl" ] ) );
-    update_post_meta( $post->ID, "_post_shift8_zoom_agenda_html", shift8_zoom_wp_kses( $_POST[ "_post_shift8_zoom_agenda_html" ] ) );
+    
+    // Check if this is the correct post type
+    if ( get_post_type( $post->ID ) !== 'shift8_zoom' ) {
+        return;
+    }
+    
+    // Verify nonce for security
+    if ( !isset( $_POST['_wpnonce'] ) || !wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'update-post_' . $post->ID ) ) {
+        return;
+    }
+    
+    // Sanitize and save each field with proper checks
+    if ( isset( $_POST[ "_post_shift8_zoom_type" ] ) ) {
+        update_post_meta( $post->ID, "_post_shift8_zoom_type", sanitize_text_field( wp_unslash( $_POST[ "_post_shift8_zoom_type" ] ) ) );
+    }
+    if ( isset( $_POST[ "_post_shift8_zoom_start" ] ) ) {
+        update_post_meta( $post->ID, "_post_shift8_zoom_start", sanitize_text_field( wp_unslash( $_POST[ "_post_shift8_zoom_start" ] ) ) );
+    }
+    if ( isset( $_POST[ "_post_shift8_zoom_duration" ] ) ) {
+        update_post_meta( $post->ID, "_post_shift8_zoom_duration", sanitize_text_field( wp_unslash( $_POST[ "_post_shift8_zoom_duration" ] ) ) );
+    }
+    if ( isset( $_POST[ "_post_shift8_zoom_timezone" ] ) ) {
+        update_post_meta( $post->ID, "_post_shift8_zoom_timezone", sanitize_text_field( wp_unslash( $_POST[ "_post_shift8_zoom_timezone" ] ) ) );
+    }
+    if ( isset( $_POST[ "_post_shift8_zoom_joinurl" ] ) ) {
+        update_post_meta( $post->ID, "_post_shift8_zoom_joinurl", esc_url_raw( wp_unslash( $_POST[ "_post_shift8_zoom_joinurl" ] ) ) );
+    }
+    if ( isset( $_POST[ "_post_shift8_zoom_agenda_html" ] ) ) {
+        update_post_meta( $post->ID, "_post_shift8_zoom_agenda_html", shift8_zoom_wp_kses( wp_unslash( $_POST[ "_post_shift8_zoom_agenda_html" ] ) ) );
+    }
 }
 add_action( 'save_post', 'shift8_zoom_save_post_meta_boxes' );
 
 // Display the custom fields
 function shift8_zoom_post_meta_box(){
     global $post;
+    
+    if ( !$post || !isset( $post->ID ) ) {
+        return;
+    }
+    
     $custom = get_post_custom( $post->ID );
-    $zoom_uuid = $custom[ "_post_shift8_zoom_uuid" ][ 0 ];
-    $zoom_id = $custom[ "_post_shift8_zoom_id" ][ 0 ];
-    $zoom_type = $custom[ "_post_shift8_zoom_type" ][ 0 ];
+    
+    // Initialize variables with safe defaults
+    $zoom_uuid = isset( $custom[ "_post_shift8_zoom_uuid" ][ 0 ] ) ? $custom[ "_post_shift8_zoom_uuid" ][ 0 ] : '';
+    $zoom_id = isset( $custom[ "_post_shift8_zoom_id" ][ 0 ] ) ? $custom[ "_post_shift8_zoom_id" ][ 0 ] : '';
+    $zoom_type = isset( $custom[ "_post_shift8_zoom_type" ][ 0 ] ) ? $custom[ "_post_shift8_zoom_type" ][ 0 ] : '';
+    
+    // Initialize selection variables
+    $webinarSelected = '';
+    $recurringNoFixedSelected = '';
+    $recurringFixedSelected = '';
+    $inpersonSelected = '';
+    $virtualSelected = '';
+    $tradeshowSelected = '';
+    
     switch ( $zoom_type ) {
         case '5':
             $webinarSelected = "selected";
@@ -143,28 +186,29 @@ function shift8_zoom_post_meta_box(){
             $tradeshowSelected = "selected";
             break;
     }
-    $zoom_start = $custom[ "_post_shift8_zoom_start" ][ 0 ];
-    $zoom_duration = $custom[ "_post_shift8_zoom_duration" ][ 0 ];
-    $zoom_timezone = $custom[ "_post_shift8_zoom_timezone" ][ 0 ];
-    $zoom_joinurl = $custom[ "_post_shift8_zoom_joinurl" ][ 0 ];
-    $zoom_agenda = $custom[ "_post_shift8_zoom_agenda_html" ][ 0 ];
+    
+    $zoom_start = isset( $custom[ "_post_shift8_zoom_start" ][ 0 ] ) ? $custom[ "_post_shift8_zoom_start" ][ 0 ] : '';
+    $zoom_duration = isset( $custom[ "_post_shift8_zoom_duration" ][ 0 ] ) ? $custom[ "_post_shift8_zoom_duration" ][ 0 ] : '';
+    $zoom_timezone = isset( $custom[ "_post_shift8_zoom_timezone" ][ 0 ] ) ? $custom[ "_post_shift8_zoom_timezone" ][ 0 ] : '';
+    $zoom_joinurl = isset( $custom[ "_post_shift8_zoom_joinurl" ][ 0 ] ) ? $custom[ "_post_shift8_zoom_joinurl" ][ 0 ] : '';
+    $zoom_agenda = isset( $custom[ "_post_shift8_zoom_agenda_html" ][ 0 ] ) ? $custom[ "_post_shift8_zoom_agenda_html" ][ 0 ] : '';
 
     echo '<div class="shift8-zoom-admin-custom-fields">';
-    echo '<label>UUID :</label><input type="text" name="_post_shift8_zoom_uuid" value="'. $zoom_uuid . '" readonly/>';
-    echo '<label>ID :</label><input type="text" name="_post_shift8_zoom_id" value="' . $zoom_id . '" readonly/><br />';
+    echo '<label>UUID :</label><input type="text" name="_post_shift8_zoom_uuid" value="' . esc_attr( $zoom_uuid ) . '" readonly/>';
+    echo '<label>ID :</label><input type="text" name="_post_shift8_zoom_id" value="' . esc_attr( $zoom_id ) . '" readonly/><br />';
 	  echo '<label>Type :</label><select name="_post_shift8_zoom_type"/>
-    <option value="shift8_inperson" ' . $inpersonSelected . '>In-person Event</option>
-		<option value="5" ' . $webinarSelected . '>Webinar</option>
-    <option value="shift8_virtual" ' . $virtualSelected . '>Virtual Event</option>
-    <option value="shift8_tradeshow" ' . $tradeshowSelected . '>Tradeshow</option>
-		<option value="6" ' . $recurringNoFixedSelected . '>Recurring webinar with no fixed time</option>
-		<option value="9" ' . $recurringFixedSelected . '>Recurring webinar with a fixed time</option>
+    <option value="shift8_inperson" ' . esc_attr( $inpersonSelected ) . '>In-person Event</option>
+		<option value="5" ' . esc_attr( $webinarSelected ) . '>Webinar</option>
+    <option value="shift8_virtual" ' . esc_attr( $virtualSelected ) . '>Virtual Event</option>
+    <option value="shift8_tradeshow" ' . esc_attr( $tradeshowSelected ) . '>Tradeshow</option>
+		<option value="6" ' . esc_attr( $recurringNoFixedSelected ) . '>Recurring webinar with no fixed time</option>
+		<option value="9" ' . esc_attr( $recurringFixedSelected ) . '>Recurring webinar with a fixed time</option>
 		</select>
 	  <br />';
-  	echo '<label>Start Time :</label><input type="text" name="_post_shift8_zoom_start" value="' . $zoom_start . '"/><br />';
-  	echo '<label>Duration :</label><input type="text" name="_post_shift8_zoom_duration" value="' . $zoom_duration . '"/><br />';
-  	echo '<label>Timezone :</label><input type="text" name="_post_shift8_zoom_timezone" value="' . $zoom_timezone . '"/><br />';
-  	echo '<label>Register URL :</label><input type="text" name="_post_shift8_zoom_joinurl" value="' . $zoom_joinurl . '"/><br />';
+  	echo '<label>Start Time :</label><input type="text" name="_post_shift8_zoom_start" value="' . esc_attr( $zoom_start ) . '"/><br />';
+  	echo '<label>Duration :</label><input type="text" name="_post_shift8_zoom_duration" value="' . esc_attr( $zoom_duration ) . '"/><br />';
+  	echo '<label>Timezone :</label><input type="text" name="_post_shift8_zoom_timezone" value="' . esc_attr( $zoom_timezone ) . '"/><br />';
+  	echo '<label>Register URL :</label><input type="text" name="_post_shift8_zoom_joinurl" value="' . esc_attr( $zoom_joinurl ) . '"/><br />';
   	echo '<label><b>Agenda Details :</b></label><br /><br />';
     wp_editor(
         htmlspecialchars_decode( $zoom_agenda ),

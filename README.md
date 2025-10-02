@@ -4,7 +4,7 @@
 * Tags: zoom, webinar, shift8, import
 * Requires at least: 3.0.1
 * Tested up to: 6.6
-* Stable tag: 1.1.2
+* Stable tag: 1.1.3
 * License: GPLv3
 * License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -119,3 +119,8 @@ Visit the support forums here and let us know. We will try our best to help!
 
 ### 1.1.2
 * Updated readme
+
+### 1.1.3
+* Fixed PHP warnings for null property access and undefined array keys
+* Improved input sanitization and output escaping for better security
+* Added proper nonce verification for form submissions
