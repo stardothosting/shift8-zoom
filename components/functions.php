@@ -12,6 +12,37 @@ if ( !defined( 'ABSPATH' ) ) {
     die();
 }
 
+function shift8_zoom_format_webinar_start_time($start_time, $timezone_name) {
+    try {
+        $webinar_datetime = new DateTimeImmutable(sanitize_text_field($start_time));
+    } catch (Exception $exception) {
+        shift8_zoom_write_log($exception->getMessage());
+        return false;
+    }
+
+    $timezone_name = sanitize_text_field($timezone_name);
+
+    try {
+        $webinar_timezone_object = new DateTimeZone($timezone_name);
+    } catch (Exception $exception) {
+        $webinar_timezone_object = new DateTimeZone('UTC');
+        $timezone_name = 'UTC';
+    }
+
+    $localized_datetime = $webinar_datetime->setTimezone($webinar_timezone_object);
+
+    try {
+        $webinar_timezone = strtoupper(CarbonTimeZone::create($timezone_name)->getAbbr());
+    } catch (Throwable $throwable) {
+        $webinar_timezone = strtoupper($localized_datetime->format('T'));
+    }
+
+    return array(
+        'start' => $localized_datetime->format('Y-m-d H:i:s'),
+        'timezone' => $webinar_timezone,
+    );
+}
+
 // Function to encrypt session data
 function shift8_zoom_encrypt($key, $payload) {
     if (!empty($key) && !empty($payload)) {
@@ -387,18 +418,23 @@ function shift8_zoom_import_webinars($webinar_data) {
                         $webinar_data['agenda'] = shift8_zoom_wp_kses( $webinar['agenda'] );
                     }
 
-                    // Adjust the start time and timezone
-                    $webinar_datetime = Carbon::create(sanitize_text_field( $webinar['start_time']))->setTimezone('UTC');
-                    $webinar_timezone = strtoupper(CarbonTimeZone::create(sanitize_text_field( $webinar['timezone'] ))->getAbbr());
+                    $webinar_datetime = shift8_zoom_format_webinar_start_time(
+                        $webinar['start_time'],
+                        $webinar['timezone']
+                    );
+
+                    if (!$webinar_datetime) {
+                        continue;
+                    }
 
                     // Insert the post into the database
                     $post_id = wp_insert_post( $webinar_post );
                     update_post_meta( $post_id, "_post_shift8_zoom_uuid", sanitize_text_field( $webinar['uuid']) );
                     update_post_meta( $post_id, "_post_shift8_zoom_id", sanitize_text_field( $webinar['id']) );
                     update_post_meta( $post_id, "_post_shift8_zoom_type", sanitize_text_field( $webinar['type']) );
-                    update_post_meta( $post_id, "_post_shift8_zoom_start", wp_date($webinar_datetime->setTimezone(sanitize_text_field( $webinar['timezone'] ))) );
+                    update_post_meta( $post_id, "_post_shift8_zoom_start", $webinar_datetime['start'] );
                     update_post_meta( $post_id, "_post_shift8_zoom_duration", sanitize_text_field( $webinar['duration'] ) );
-                    update_post_meta( $post_id, "_post_shift8_zoom_timezone", sanitize_text_field( $webinar_timezone ) );
+                    update_post_meta( $post_id, "_post_shift8_zoom_timezone", sanitize_text_field( $webinar_datetime['timezone'] ) );
                     update_post_meta( $post_id, "_post_shift8_zoom_joinurl", $webinar_data['registration_url'] );
                     update_post_meta( $post_id, "_post_shift8_zoom_agenda_html", $webinar_data['agenda'] );
                     $import_count++;
