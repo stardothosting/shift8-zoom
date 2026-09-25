@@ -3,8 +3,8 @@
 * Donate link: https://www.shift8web.ca
 * Tags: zoom, webinar, shift8, import
 * Requires at least: 3.0.1
-* Tested up to: 6.6
-* Stable tag: 1.1.4
+* Tested up to: 7.1
+* Stable tag: 1.1.5
 * License: GPLv3
 * License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -128,3 +128,7 @@ Visit the support forums here and let us know. We will try our best to help!
 = 1.1.4 =
 * Replaced Carbon-based Zoom timestamp parsing with native PHP datetime parsing for PHP 8.3 compatibility
 * Preserved the existing imported webinar start meta format and timezone abbreviation behavior
+
+= 1.1.5 =
+* WordPress 7.1 compatibility
+
