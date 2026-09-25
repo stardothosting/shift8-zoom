@@ -4,7 +4,7 @@
 * Tags: zoom, webinar, shift8, import
 * Requires at least: 3.0.1
 * Tested up to: 7.1
-* Stable tag: 1.1.5
+* Stable tag: 1.1.6
 * License: GPLv3
 * License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -132,3 +132,5 @@ Visit the support forums here and let us know. We will try our best to help!
 = 1.1.5 =
 * WordPress 7.1 compatibility
 
+= 1.1.6 =
+* Minor bug fixes
