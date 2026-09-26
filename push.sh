@@ -11,6 +11,71 @@ fi
 MESSAGE="$1"
 VERSION="$2"
 
+PLUGIN_FILE="shift8-zoom.php"
+
+count_plugin_headers() {
+    target="$1"
+    grep -RilE \
+        --include='*.php' \
+        '^[[:space:]]*\*[[:space:]]*Plugin Name:' \
+        "$target" | wc -l | tr -d '[:space:]'
+}
+
+print_plugin_headers() {
+    target="$1"
+    grep -RniE \
+        --include='*.php' \
+        '^[[:space:]]*\*[[:space:]]*Plugin Name:' \
+        "$target"
+}
+
+assert_release_tree() {
+    target="$1"
+    label="$2"
+
+    if [ ! -f "$target/$PLUGIN_FILE" ]
+    then
+        echo "ERROR: $label is missing $PLUGIN_FILE"
+        exit 1
+    fi
+
+    plugin_headers=$(count_plugin_headers "$target")
+
+    if [ "$plugin_headers" -ne 1 ]
+    then
+        echo "ERROR: Found $plugin_headers PHP files containing Plugin Name headers in $label:"
+        print_plugin_headers "$target"
+        exit 1
+    fi
+
+    if ! grep -qiE "^[[:space:]]*\*[[:space:]]*Version:[[:space:]]*$VERSION[[:space:]]*$" "$target/$PLUGIN_FILE"
+    then
+        echo "ERROR: $label/$PLUGIN_FILE Version does not match $VERSION"
+        exit 1
+    fi
+
+    if ! grep -qiE "^[[:space:]]*\*[[:space:]]*Stable tag:[[:space:]]*$VERSION[[:space:]]*$" "$target/readme.txt"
+    then
+        echo "ERROR: $label/readme.txt Stable tag does not match $VERSION"
+        exit 1
+    fi
+
+    forbidden_paths=$(find "$target" \( \
+        -path "$target/.git" -o \
+        -path "$target/.github" -o \
+        -path "$target/svn" -o \
+        -path "$target/trunk" -o \
+        -path "$target/tags" \
+    \) -print)
+
+    if [ -n "$forbidden_paths" ]
+    then
+        echo "ERROR: $label contains repository-only directories that should not be published:"
+        printf '%s\n' "$forbidden_paths"
+        exit 1
+    fi
+}
+
 # Sanity check release metadata before doing anything
 if ! grep -qiE "^[[:space:]]*\*[[:space:]]*Version:[[:space:]]*$VERSION[[:space:]]*$" shift8-zoom.php
 then
@@ -59,21 +124,7 @@ do
     esac
 done
 
-# Safety check: there should only be one WordPress plugin header
-PLUGIN_HEADERS=$(grep -RilE \
-    --include='*.php' \
-    '^[[:space:]]*\*[[:space:]]*Plugin Name:' \
-    trunk | wc -l)
-
-if [ "$PLUGIN_HEADERS" -ne 1 ]
-then
-    echo "ERROR: Found $PLUGIN_HEADERS PHP files containing Plugin Name headers:"
-    grep -RniE \
-        --include='*.php' \
-        '^[[:space:]]*\*[[:space:]]*Plugin Name:' \
-        trunk
-    exit 1
-fi
+assert_release_tree trunk trunk
 
 # Refuse to overwrite/reuse an existing release tag
 if [ -e "tags/$VERSION" ]
@@ -84,6 +135,8 @@ fi
 
 # Create SVN release tag from clean trunk
 svn copy trunk "tags/$VERSION"
+
+assert_release_tree "tags/$VERSION" "tags/$VERSION"
 
 svn status
 
