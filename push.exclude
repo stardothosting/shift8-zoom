@@ -1,0 +1,7 @@
+.git
+.gitignore
+svn
+assets
+push.sh
+push.exclude
+README.md
